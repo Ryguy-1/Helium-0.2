@@ -42,7 +42,6 @@ public class WebHookSeleniumManager {
         hook.setContent("The Webhook added to this channel!");
         hook.execute();
         hook.setContent("");
-
     }
 
     public void sendChannel(MessageChannel channel) {
@@ -50,15 +49,6 @@ public class WebHookSeleniumManager {
     }
 
     public void sendCommand(String command) {
-
-        // this.bot = new SeleniumBot(this);
-
-        System.out.println("CORRECT CHANNEL");
-        System.out.println(command + " is the command");
-
-//		if user wants to set channel and checking has not begun
-
-
         if (command.equals("!Add URL") && !addingProductURL) {
             channel.sendMessage(
                     "Please enter the URL as the command parameter for the product you would like to monitor.").queue();
@@ -71,137 +61,14 @@ public class WebHookSeleniumManager {
             botsLocal.get(botsLocal.size()-1).setIsActiveTrue();
             addingProductURL = false;
             channel.sendMessage("Monitor Successfully Created!").queue();
-            // adding best buy start
-        } else if (command.equals("!Add BestBuy") && bestBuyAdded == false) {
-
-            channel.sendMessage("Adding Best Buy stock URLs...").queue();
-            for (int i = 0; i < Runner.bestBuyBots.size(); i++) {
-
-                Runner.bestBuyBots.get(i).addManager(this);
-                monitoringLinks.add(Runner.bestBuyURLs[i]);
-            }
-
-            channel.sendMessage("Best Buy successfully added!").queue();
-
-            bestBuyAdded = true;
-            for (int i = 0; i < Runner.bestBuyBots.size(); i++) {
-                Runner.bestBuyBots.get(i).setIsActiveTrue();
-            }
-
-        } else if (command.equals("!Add BestBuy") && bestBuyAdded) {
-
-            channel.sendMessage("You have already added Best Buy to this webhook.").queue();
-            // adding best buy end
-            // adding target start
-        } else if (command.equals("!Add Target") && targetAdded == false) {
-
-            channel.sendMessage("Adding Target stock URLs...").queue();
-            for (int i = 0; i < Runner.targetBots.size(); i++) {
-
-                Runner.targetBots.get(i).addManager(this);
-                monitoringLinks.add(Runner.targetURLs[i]);
-            }
-
-            channel.sendMessage("Target successfully added!").queue();
-
-            targetAdded = true;
-            for (int i = 0; i < Runner.targetBots.size(); i++) {
-                Runner.targetBots.get(i).setIsActiveTrue();
-            }
-
-        } else if (command.equals("!Add Target") && targetAdded) {
-
-            channel.sendMessage("You have already added Target to this webhook.").queue();
-            // adding target end
-        } else if(command.equals("!Add Walmart") && walmartAdded == false) {
-
-            channel.sendMessage("Adding Walmart stock URLs...").queue();
-            for (int i = 0; i < Runner.walmartBots.size(); i++) {
-
-                Runner.walmartBots.get(i).addManager(this);
-                monitoringLinks.add(Runner.walmartURLs[i]);
-            }
-
-            channel.sendMessage("Walmart successfully added!").queue();
-
-            walmartAdded = true;
-            for (int i = 0; i < Runner.walmartBots.size(); i++) {
-                Runner.walmartBots.get(i).setIsActiveTrue();
-            }
-
-
-        }else if(command.equals("!Add Walmart") && walmartAdded) {
-
-
-            channel.sendMessage("You have already added Walmart to this webhook.").queue();
-
-
-
-        }else if (command.equals("!Add GameStop") && gameStopAdded == false) {
-            channel.sendMessage("Adding GameStop stock URLs...").queue();
-            for (int i = 0; i < Runner.gameStopBots.size(); i++) {
-
-                Runner.gameStopBots.get(i).addManager(this);
-                monitoringLinks.add(Runner.gameStopURLs[i]);
-            }
-
-            channel.sendMessage("GameStop successfully added!").queue();
-
-            gameStopAdded = true;
-            for (int i = 0; i < Runner.gameStopBots.size(); i++) {
-                Runner.gameStopBots.get(i).setIsActiveTrue();
-            }
-
-        } else if (command.equals("!Add GameStop") && gameStopAdded) {
-            channel.sendMessage("You have already added GameStop to this webhook.").queue();
-        }else if (command.equals("!Add Amazon") && amazonAdded == false) {
-            System.out.println("Amazonbots size is "+ Runner.amazonBots.size());
-            channel.sendMessage("Adding Amazon stock URLs...").queue();
-            for (int i = 0; i < Runner.amazonBots.size(); i++) {
-
-                Runner.amazonBots.get(i).addManager(this);
-                monitoringLinks.add(Runner.amazonURLs[i]);
-            }
-
-            channel.sendMessage("Amazon successfully added!").queue();
-
-            amazonAdded = true;
-            for (int i = 0; i < Runner.amazonBots.size(); i++) {
-                System.out.println("amazonBots active loop ran  on i="+i);
-                Runner.amazonBots.get(i).setIsActiveTrue();
-            }
-
-        } else if (command.equals("!Add Amazon") && amazonAdded) {
-            channel.sendMessage("You have already added Amazon to this webhook.").queue();
-        }else if (command.equals("!Help")) {
+        }else if (command.equalsIgnoreCase("!Help")) {
             System.out.println("HELP WEBHOOK");
             channel.sendMessage("Webhook edit commands: \n!Add URL   -   Add a URL for the webhook to monitor.")
                     .queue();
         }
-
     }
 
     public void removeOutputs() {
-
-        System.out.println("Now removing outputs");
-
-        //disables general bots.
-        for (int i = 0; i < Runner.bestBuyBots.size(); i++) {
-            Runner.bestBuyBots.get(i).removeManager(this);
-        }
-        for (int i = 0; i < Runner.targetBots.size(); i++) {
-            Runner.targetBots.get(i).removeManager(this);
-        }
-        for (int i = 0; i < Runner.gameStopBots.size(); i++) {
-            Runner.gameStopBots.get(i).removeManager(this);
-        }
-        for (int i = 0; i < Runner.walmartBots.size(); i++) {
-            Runner.walmartBots.get(i).removeManager(this);
-        }
-        for (int i = 0; i < Runner.amazonBots.size(); i++) {
-            Runner.amazonBots.get(i).removeManager(this);
-        }
-
 
         //removes private bots
         for (int i = 0; i < monitoringLinks.size(); i++) {
@@ -212,43 +79,26 @@ public class WebHookSeleniumManager {
             botsLocal.get(i).quitBot();
             botsLocal.remove(i);
         }
-
-
     }
-
 
     public void sendProductAvailable(String URL, String price, String website, boolean isRestock, boolean isPriceChange,
                                      String productTitle, String imageURL, String SKU, String logo) {
-
-        // will be website + " Restock Bot"
-//			hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle("The Man of Men") // Item Listing Name
-//					.setDescription("Ruler of Men") // Subtitle for listing name
-//					.setColor(Color.BLUE).addField("1st Field", "Inline", true) // ex: Price(as 1st Field) &amount(as Inline)
-//					.addField("2nd Field", "Inline", true)
-//					.addField("3rd Field", "No-Inline", false)
-//					.setThumbnail("https://www.nintendo.com/content/dam/noa/en_US/hardware/switch/nintendo-switch-new-package/gallery/bundle_color_portable%20(1).jpg") //thumnail picture of switch
-//					.setFooter("Footer text", "https://i2.wp.com/ceklog.kindel.com/wp-content/uploads/2013/02/firefox_2018-07-10_07-50-11.png") // apple picture probably for my profile
-//					.setImage("https://www.apple.com/ac/structured-data/images/open_graph_logo.png?201809210816")
-//					.setAuthor("Author Name", "https://kryptongta.com", "https://kryptongta.com/images/kryptonlogowide.png")
-//					.setUrl("https://kryptongta.com")); //Actual URL of the product to link the person to it.
 
         if(productTitle.length()>50) {
             productTitle = productTitle.substring(0, 50);
         }
 
-        System.out.println("Will try to make embed");
         if (hook.getEmbedList().size() > 0) {
             hook.removeEmbeds();
         }
 
         if (isRestock) {
-
             hook.setUsername(website);
             hook.setTts(true);
             hook.setAvatarUrl("https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png");
 
-            if (website.equals("Best Buy")) {
 
+            if (website.equals("Best Buy")) {
                 if (price.contains("$")) {
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", price, true).setThumbnail(imageURL).setUrl(URL)
@@ -263,10 +113,10 @@ public class WebHookSeleniumManager {
                                     "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
                 }
 
-            } else if (website.equals("Target")) {
 
-                // target has the sku from the url as the second field
 
+            }
+            else if (website.equals("Target")) {
                 String skuTemp;
                 try {
                     Integer.parseInt(URL.substring(URL.length() - 19, URL.length() - 12));
@@ -274,16 +124,12 @@ public class WebHookSeleniumManager {
                 }catch(Exception e) {
                     skuTemp = URL.substring(URL.length()-8);
                 }
-
-
-
                 if (price.contains("$")) {
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", price, true)
                             .addField("**SKU**", skuTemp, true).setThumbnail(imageURL)
                             .setUrl(URL).setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
                                     "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-
                 } else {
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", "$" + price, true)
@@ -292,32 +138,16 @@ public class WebHookSeleniumManager {
                                     "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
                 }
 
-            } else if (website.equals("GameStop")) {
 
+
+            }
+            else if(website.equals("Amazon")) {
                 if (price.contains("$")) {
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", price, true).setThumbnail(imageURL).setUrl(URL)
                             .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
                                     "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-
                 } else {
-
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", "$" + price, true).setThumbnail(imageURL).setUrl(URL)
-                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                }
-
-            }else if(website.equals("Amazon")) {
-
-                if (price.contains("$")) {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", price, true).setThumbnail(imageURL).setUrl(URL)
-                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-
-                } else {
-
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", "$" + price, true).setThumbnail(imageURL).setUrl(URL)
                             .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
@@ -326,34 +156,22 @@ public class WebHookSeleniumManager {
 
 
 
-
-            }else if(website.equals("Walmart")) {
-
+            }
+            else if(website.equals("Walmart")) {
                 if (price.contains("$")) {
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", price, true).addField("**SKU**", SKU, true).setThumbnail(imageURL).setUrl(URL)
                             .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
                                     "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-
                 } else {
-
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", "$" + price, true).addField("**SKU**", SKU, true).setThumbnail(imageURL).setUrl(URL)
                             .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
                                     "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
                 }
-
-
-
-
             }
 
-//			hook.addEmbed(new DiscordWebhook.EmbedObject()
-//					.setAuthor("Powered by ZipBot",
-//							"https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg",
-//							"https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg")
-//					.setColor(new Color(0, 137, 255)));
-
+            //try to send the webhook
             try {
                 hook.execute();
             } catch (IOException e) {
@@ -364,52 +182,5 @@ public class WebHookSeleniumManager {
                         .queue();
             }
         }
-
-//		} else if (isPriceChange) {
-//
-//			hook.setUsername(website + " Monitoring Bot");
-//			hook.setTts(true);
-//			hook.setAvatarUrl(logo);
-//			hook.addEmbed(new DiscordWebhook.EmbedObject()
-//					.setTitle(productTitle).addField("Price", price, true)
-//					.setImage(imageURL).setUrl(URL).addField("SKU", SKU, true));
-//			hook.addEmbed(new DiscordWebhook.EmbedObject().setAuthor(
-//					"Powered by ZipBot", "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg",
-//					"https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg"));
-//
-//			try {
-//				hook.execute();
-//			} catch (IOException e) {
-//				// TODO Auto-generated catch block
-//				channel.sendMessage(
-//						"Could Not Execute Webhook. Please report error and developers will fix as soon as possible!")
-//						.queue();
-//			}
-//
-//		}
-
     }
-
-//		DiscordWebhook webhook = new DiscordWebhook(
-//				"https://discordapp.com/api/webhooks/734290424931549238/mn2t4RP388-zju29KAjgfHf9Lb3ckOGwIsrpqBllrk5ai98-ZiAEIet5ab08IkYyxEAD");
-//		webhook.setContent(""); // subtitle
-//		webhook.setAvatarUrl(
-//				"https://lh3.googleusercontent.com/proxy/wDL51F9eYWEZdMHJOAlsoRe5D9Qv27jjneanz8q_fUoOCc_4TYo9zLfd24ZfeVDB1CzDUHUbecU3TcZ4QqNuVOQZLqrwUH8EM3DWDSDui9LH1PHovL4a90DCopSHwOqDyrweGLq4UZHId77EyfDr3YiFbQaKMms");
-//		webhook.setUsername("Amazon Restock Bot");
-//		webhook.setTts(true);
-//		webhook.addEmbed(new DiscordWebhook.EmbedObject().setTitle("The Man of Men") // Item Listing Name
-//				.setDescription("Ruler of Men") // Subtitle for listing name
-//				.setColor(Color.BLUE).addField("1st Field", "Inline", true) // ex: Price(as 1st Field) &amount(as Inline)
-//				.addField("2nd Field", "Inline", true)
-//				.addField("3rd Field", "No-Inline", false)
-//				.setThumbnail("https://www.nintendo.com/content/dam/noa/en_US/hardware/switch/nintendo-switch-new-package/gallery/bundle_color_portable%20(1).jpg") //thumnail picture of switch
-//				.setFooter("Footer text", "https://i2.wp.com/ceklog.kindel.com/wp-content/uploads/2013/02/firefox_2018-07-10_07-50-11.png") // apple picture probably for my profile
-//				.setImage("https://www.apple.com/ac/structured-data/images/open_graph_logo.png?201809210816")
-//				.setAuthor("Author Name", "https://kryptongta.com", "https://kryptongta.com/images/kryptonlogowide.png")
-//				.setUrl("https://kryptongta.com")); //Actual URL of the product to link the person to it.
-//		webhook.addEmbed(new DiscordWebhook.EmbedObject().setDescription("Just another added embed object!"));
-//		webhook.execute(); // Handle exception
-//
-//
-//
 }

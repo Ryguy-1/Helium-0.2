@@ -47,24 +47,19 @@ public class GeneralInputManager extends ListenerAdapter {
                     break;
                 }
             }
-
         }
         // if not in a guild do this...
         if (!inGuilds) {
             // tries to add the new guild if the message was sent from a guild and inGuilds
             // == false
             try {
-                System.out.println("Not in guilds");
                 Runner.guildIds.add(event.getGuild().getId());
-                System.out.println(event.getGuild().getId());
                 try {
                     // adds new input manager for the new guild
                     Runner.managers.add(new InputManager(event.getGuild().getId()));
                 } catch (Exception e) {
-                    System.out.println("Could not create new Input Manager because of Login Exception");
                     e.printStackTrace();
                 }
-                System.out.println("sent event");
                 // sends the event just put in to the latest created inputManager. This ensures
                 // no messages go unheard.
                 Runner.managers.get(Runner.managers.size() - 1).sendEvent(event);
@@ -84,21 +79,14 @@ public class GeneralInputManager extends ListenerAdapter {
             // directs the event to that inputManager.
             for (int i = 0; i < Runner.guildIds.size(); i++) {
                 if (Runner.guildIds.get(i).equals(event.getGuild().getId())) {
-
                     // managers and guildIds have same indexes
-
                     try {
                         Runner.managers.get(i).sendEvent(event);
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-
                 }
             }
-
         }
-
     }
-
 }
