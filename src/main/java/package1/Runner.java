@@ -1,20 +1,24 @@
 package package1;
 
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.security.auth.login.LoginException;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 
 //creates new GeneralInputManager.
 public class Runner implements ActionListener {
 
     // test github2
+
+    public static final int WIDTH = 180;
+    public static final int HEIGHT = 350;
 
     public static ArrayList<String> guildIds;
     public static ArrayList<InputManager> managers;
@@ -67,9 +71,24 @@ public class Runner implements ActionListener {
     public static ArrayList<SeleniumBot> walmartBots;
     public static ArrayList<SeleniumBot> amazonBots;
 
+
+
     public static JFrame frame;
     public static JPanel panel;
     public static JButton b1;
+    public static JCheckBox box;
+    public static JButton startStop;
+
+    public static JTextField key = new JTextField("Discord API Key Here");
+
+    public static JTextField f1 = new JTextField("Paste Link 1 Here");
+    public static JTextField f2 = new JTextField("Paste Link 2 Here");
+    public static JTextField f3 = new JTextField("Paste Link 3 Here");
+    public static JTextField f4 = new JTextField("Paste Link 4 Here");
+    public static JTextField f5 = new JTextField("Paste Link 5 Here");
+    public static JTextField f6 = new JTextField("Paste Link 6 Here");
+
+
 
     public static void main(String[] args) throws LoginException, IOException {
 
@@ -155,14 +174,14 @@ public class Runner implements ActionListener {
 
 
         //RUN THESE TWO FOR LAUNCH
-        for (int i = 0; i < bestBuyURLs.length; i++) {
-            bestBuyBots.add(new SeleniumBot(bestBuyURLs[i]));
-            System.out.println("added");
-        }
-
-        for (int i = 0; i < targetURLs.length; i++) {
-            targetBots.add(new SeleniumBot(targetURLs[i]));
-        }
+//        for (int i = 0; i < bestBuyURLs.length; i++) {
+//            bestBuyBots.add(new SeleniumBot(bestBuyURLs[i]));
+//            System.out.println("added");
+//        }
+//
+//        for (int i = 0; i < targetURLs.length; i++) {
+//            targetBots.add(new SeleniumBot(targetURLs[i]));
+//        }
 
 
 
@@ -191,15 +210,49 @@ public class Runner implements ActionListener {
 
     private void setup() {
 
-        frame = new JFrame();
+        frame = new JFrame("Helium Restocks");
+        frame.setBounds(200, 200, WIDTH, HEIGHT);
+        //centers title text
+        frame.setLocationRelativeTo(null);
         panel = new JPanel();
         b1 = new JButton("Quit Helium Restocks");
+        box = new JCheckBox("Show Chrome Windows");
+        startStop = new JButton("Start");
+        box.addActionListener(this);
+        startStop.addActionListener(this);
+
         b1.addActionListener(this);
+        b1.setBorderPainted(false);
+        b1.setFocusPainted(false);
+        b1.setContentAreaFilled(true);
+        b1.setBackground(new Color(136, 175, 156));
+        b1.setForeground(new Color (255,255,255));
+
+        startStop.setBorderPainted(false);
+        startStop.setFocusPainted(false);
+        startStop.setContentAreaFilled(true);
+        startStop.setBackground(new Color(136, 175, 156));
+        startStop.setForeground(new Color (255,255,255));
+
+
         frame.add(panel);
         panel.add(b1);
+        panel.add(key);
+        panel.add(box);
+        panel.add(f1);
+        panel.add(f2);
+        panel.add(f3);
+        panel.add(f4);
+        panel.add(f5);
+        panel.add(f6);
+
+        panel.add(startStop);
+        panel.setBackground(new Color(125, 120, 124));
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
+
+
+
 
     }
 
@@ -210,8 +263,24 @@ public class Runner implements ActionListener {
         if (e.getSource() == b1) {
             System.clearProperty("http.proxyHost");
             System.exit(0);
+        }else if(e.getSource() == startStop){
+            System.out.println("STARTSTOP");
+            if(startStop.getText().equals("Start")){
+                startStop.setText("Stop");
+            }else if(startStop.getText().equals("Stop")){
+                startStop.setText("Start");
+            }
+        }else if(e.getSource() == box){
+            System.out.println("Box");
+            if(box.isSelected()){
+                System.out.println("Selected");
+            }else{
+                System.out.println("Not Selected");
+            }
         }
 
     }
 
 }
+
+
