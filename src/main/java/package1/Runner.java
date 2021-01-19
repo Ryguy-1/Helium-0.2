@@ -290,7 +290,6 @@ public class Runner implements ActionListener {
                     startStopScraping.setVisible(true);
                 }catch(Exception except){
                     startStopDiscord.setText("Start Discord");
-                    except.printStackTrace();
                 }
             }
         }else if(e.getSource() == box){
@@ -302,7 +301,7 @@ public class Runner implements ActionListener {
             }
         }else if(e.getSource() == startStopScraping){
             if(startStopScraping.getText().equals("Start Scraping")) {
-                System.out.print("start scraping");
+                System.out.println("start scraping");
                 startStopScraping.setText("Started Scraping...");
             }
         }
