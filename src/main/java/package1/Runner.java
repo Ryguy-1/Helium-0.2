@@ -77,7 +77,8 @@ public class Runner implements ActionListener {
     public static JPanel panel;
     public static JButton b1;
     public static JCheckBox box;
-    public static JButton startStop;
+    public static JButton startStopDiscord;
+    public static JButton startStopScraping;
 
     public static JTextField key = new JTextField("Discord API Key Here");
 
@@ -88,7 +89,7 @@ public class Runner implements ActionListener {
     public static JTextField f5 = new JTextField("Paste Link 5 Here");
     public static JTextField f6 = new JTextField("Paste Link 6 Here");
 
-
+    GeneralInputManager generalManager;
 
     public static void main(String[] args) throws LoginException, IOException {
 
@@ -111,7 +112,7 @@ public class Runner implements ActionListener {
         r.setup();
         r.initializeBots();
 
-        GeneralInputManager generalManager = new GeneralInputManager();
+
 
         // my best buy api key: RJJ50e5KfPYCfjKjHjVgDuvG
 
@@ -209,18 +210,14 @@ public class Runner implements ActionListener {
     }
 
     private void setup() {
-
-        frame = new JFrame("Helium Restocks");
-        frame.setBounds(200, 200, WIDTH, HEIGHT);
-        //centers title text
-        frame.setLocationRelativeTo(null);
-        panel = new JPanel();
-        b1 = new JButton("Quit Helium Restocks");
+        //check box
         box = new JCheckBox("Show Chrome Windows");
-        startStop = new JButton("Start");
         box.addActionListener(this);
-        startStop.addActionListener(this);
 
+
+
+        //quit button
+        b1 = new JButton("Quit Helium Restocks");
         b1.addActionListener(this);
         b1.setBorderPainted(false);
         b1.setFocusPainted(false);
@@ -228,14 +225,27 @@ public class Runner implements ActionListener {
         b1.setBackground(new Color(136, 175, 156));
         b1.setForeground(new Color (255,255,255));
 
-        startStop.setBorderPainted(false);
-        startStop.setFocusPainted(false);
-        startStop.setContentAreaFilled(true);
-        startStop.setBackground(new Color(136, 175, 156));
-        startStop.setForeground(new Color (255,255,255));
+        //discord start
+        startStopDiscord = new JButton("Start Discord");
+        startStopDiscord.setBorderPainted(false);
+        startStopDiscord.setFocusPainted(false);
+        startStopDiscord.setContentAreaFilled(true);
+        startStopDiscord.setBackground(new Color(136, 175, 156));
+        startStopDiscord.setForeground(new Color (255,255,255));
+        startStopDiscord.addActionListener(this);
 
+        //scraping start
+        startStopScraping = new JButton("Start Scraping");
+        startStopScraping.setBorderPainted(false);
+        startStopScraping.setFocusPainted(false);
+        startStopScraping.setContentAreaFilled(true);
+        startStopScraping.setBackground(new Color(136, 175, 156));
+        startStopScraping.setForeground(new Color (255,255,255));
+        startStopScraping.addActionListener(this);
+        startStopScraping.setVisible(false);
 
-        frame.add(panel);
+        //JPanel
+        panel = new JPanel();
         panel.add(b1);
         panel.add(key);
         panel.add(box);
@@ -245,11 +255,18 @@ public class Runner implements ActionListener {
         panel.add(f4);
         panel.add(f5);
         panel.add(f6);
-
-        panel.add(startStop);
+        panel.add(startStopDiscord);
+        panel.add(startStopScraping);
         panel.setBackground(new Color(125, 120, 124));
+
+        //jFrame
+        frame = new JFrame("Helium Restocks");
+        frame.setBounds(200, 200, WIDTH, HEIGHT);
+        //centers title text
+        frame.setLocationRelativeTo(null);
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(panel);
 
 
 
@@ -257,18 +274,24 @@ public class Runner implements ActionListener {
     }
 
     @Override
-    public void actionPerformed(ActionEvent e) {
+    public void actionPerformed(ActionEvent e){
         // TODO Auto-generated method stub
 
         if (e.getSource() == b1) {
             System.clearProperty("http.proxyHost");
             System.exit(0);
-        }else if(e.getSource() == startStop){
+        }else if(e.getSource() == startStopDiscord){
             System.out.println("STARTSTOP");
-            if(startStop.getText().equals("Start")){
-                startStop.setText("Stop");
-            }else if(startStop.getText().equals("Stop")){
-                startStop.setText("Start");
+            if(startStopDiscord.getText().equals("Start Discord")){
+                try {
+                    startStopDiscord.setText("Discord Bot Running...");
+                    generalManager = new GeneralInputManager(key.getText());
+                    //can only scrape after discord has been enabled
+                    startStopScraping.setVisible(true);
+                }catch(Exception except){
+                    startStopDiscord.setText("Start Discord");
+                    except.printStackTrace();
+                }
             }
         }else if(e.getSource() == box){
             System.out.println("Box");
@@ -276,6 +299,11 @@ public class Runner implements ActionListener {
                 System.out.println("Selected");
             }else{
                 System.out.println("Not Selected");
+            }
+        }else if(e.getSource() == startStopScraping){
+            if(startStopScraping.getText().equals("Start Scraping")) {
+                System.out.print("start scraping");
+                startStopScraping.setText("Started Scraping...");
             }
         }
 

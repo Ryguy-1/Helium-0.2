@@ -17,10 +17,11 @@ public class GeneralInputManager extends ListenerAdapter {
     private JDA jda;
     private boolean isWrong;
 
-    GeneralInputManager() throws LoginException {
+
+    GeneralInputManager(String key) throws LoginException {
         guildId = "";
         //Helium Restocks Code
-        jda = JDABuilder.createDefault("NzM0Mjk5NTIxMDI2MzU5MzY4.XxPruA.LlTDCP0EhYhC3asACfSdW5wO6YI")
+        jda = JDABuilder.createDefault(key)
                 .addEventListeners(this).build();
         isWrong = false;
     }
