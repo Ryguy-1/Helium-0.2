@@ -483,18 +483,24 @@ public class SeleniumBot {
     }
 
     public void initializeBot() {
-		//test invisible
-		if(!Runner.box.isSelected()) {
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors", "--silent");
-            //end test
+//		//test invisible
+//		if(!Runner.box.isSelected()) {
+//            ChromeOptions options = new ChromeOptions();
+//            options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors", "--silent");
+//            //end test
+//
+//            driver = new ChromeDriver(options);// would put "options" as the parameter for testing
+//            resizeWindow(driver, 1500, 800);
+//        }else{
+//            driver = new ChromeDriver();// would put "options" as the parameter for testing
+//            resizeWindow(driver, 1500, 800);
+//        }
+        driver = new ChromeDriver();// would put "options" as the parameter for testing
+        resizeWindow(driver, 1500, 800);
 
-            driver = new ChromeDriver(options);// would put "options" as the parameter for testing
-            resizeWindow(driver, 1500, 800);
-        }else{
-            driver = new ChromeDriver();// would put "options" as the parameter for testing
-            resizeWindow(driver, 1500, 800);
-        }
+
+
+
     }
 
     public void resizeWindow(WebDriver driver, int width, int height) {

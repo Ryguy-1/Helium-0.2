@@ -11,9 +11,11 @@ package1/InputManager.java
  package1.InputManager
 package1/WebHookSeleniumManager.java
  package1.WebHookSeleniumManager
-package1/Runner.java
- package1.Runner
-package1/GeneralInputManager.java
- package1.GeneralInputManager
 package1/SeleniumBot.java
  package1.SeleniumBot
+package1/GeneralInputManager.java
+ package1.GeneralInputManager
+package1/Runner.java
+ package1.Runner
+package1/AppPanel.java
+ package1.AppPanel

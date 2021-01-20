@@ -2,9 +2,6 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
-
 repositories {
     jcenter()
 }
@@ -15,8 +12,4 @@ dependencies {
     implementation 'net.dv8tion:JDA:4.2.0_227'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-}
-
-test {
-    useJUnitPlatform()
 }
