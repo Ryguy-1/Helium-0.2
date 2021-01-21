@@ -95,6 +95,10 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     private void drawHomeState(Graphics g){
 
+        g.setColor(Color.white);
+        g.fillRect(0, 0, Runner.WIDTH, Runner.HEIGHT);
+
+
     }
 
 
@@ -109,10 +113,13 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
     @Override
     public void mouseClicked(MouseEvent e) {
 
-        System.out.println("clicked");
+        if(currentState == LOGIN_STATE) {
+            if (startButton.contains(e.getX(), e.getY())) {
+                System.out.println("Start button was Clicked");
+                currentState = HOME_STATE;
+            }
+        }else if(currentState == HOME_STATE){
 
-        if(startButton.contains(e.getX(), e.getY())){
-            System.out.println("Start button was Clicked");
         }
 
 
@@ -146,11 +153,16 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
     @Override
     public void mouseMoved(MouseEvent e) {
 
-        if(startButton.contains(e.getX(), e.getY())){
-            startButton.setTextColor(Color.GRAY);
-        }else{
-            startButton.setTextColor(Color.WHITE);
-        }
+
+       if(currentState == LOGIN_STATE) {
+           if (startButton.contains(e.getX(), e.getY())) {
+               startButton.setTextColor(Color.GRAY);
+           } else {
+               startButton.setTextColor(Color.WHITE);
+           }
+       }else if(currentState == HOME_STATE){
+
+       }
 
     }
 }

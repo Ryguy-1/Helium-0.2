@@ -15,9 +15,9 @@ package1/SeleniumBot.java
  package1.SeleniumBot
 package1/GeneralInputManager.java
  package1.GeneralInputManager
+package1/CustomButton.java
+ package1.CustomButton
 package1/Runner.java
  package1.Runner
 package1/AppPanel.java
  package1.AppPanel
-package1/CustomButton.java
- package1.CustomButton
