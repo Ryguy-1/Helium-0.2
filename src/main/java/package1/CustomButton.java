@@ -11,14 +11,18 @@ public class CustomButton {
     private int height;
     private String text;
     private Color textColor;
+    private int offsetX;
+    private int offsetY;
 
-    CustomButton(int x, int y, int width, int height, String text, Color textColor){
+    CustomButton(int x, int y, int width, int height, String text, Color textColor, int offsetX, int offsetY){
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
         this.text = text;
         this.textColor = textColor;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
     }
 
 
@@ -32,7 +36,7 @@ public class CustomButton {
 
 
         g.setColor(textColor);
-        g.drawString(text, x+37, y+70);
+        g.drawString(text, x+offsetX, y+offsetY);
 
     }
 

@@ -26,7 +26,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         currentState = 0;
         titleFont = new Font("Impact", Font.PLAIN, 78);
         buttonFont = new Font("Impact", Font.PLAIN, 48);
-        startButton = new CustomButton(Runner.WIDTH*11/16, Runner.HEIGHT*1/6, 300, 100, "Start Helium", Color.white);
+        startButton = new CustomButton(Runner.WIDTH*11/16, Runner.HEIGHT*1/6, 300, 100, "Start Helium", Color.white, 37, 70);
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
 
