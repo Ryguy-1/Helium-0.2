@@ -29,7 +29,7 @@ public class CustomButton {
 
 
     public void draw(Graphics g){
-        ////////////////////////Get Rid of For Finished Product
+        ////////////////////////Show Hitbox
 //        g.setColor(Color.GREEN);//shows hitboxes
 //        g.drawRect(x, y, width, height);
         /////////////////////////////////

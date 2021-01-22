@@ -11,22 +11,29 @@ import java.net.URL;
 public class AppPanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
 
-    Font titleFont;
-    Font buttonFont;
+    private Font titleFont;
+    private Font buttonFont;
+    private Font smallButtonFont;
 
-    final int LOGIN_STATE = 0;
-    final int HOME_STATE = 1;
+    public static final int LOGIN_STATE = 0;
+    public static final int HOME_STATE = 1;
+
+    //LOGIN_STATE
+    private CustomButton startButton;
+
+    //HOME_STATE
+    private CustomButton returnToLauncher;
 
 
-    CustomButton startButton;
-
-    int currentState;
+    public static int currentState;
 
     AppPanel(){
         currentState = 0;
         titleFont = new Font("Impact", Font.PLAIN, 78);
         buttonFont = new Font("Impact", Font.PLAIN, 48);
+        smallButtonFont = new Font("Impact", Font.PLAIN, 25);
         startButton = new CustomButton(Runner.WIDTH*11/16, Runner.HEIGHT*1/6, 300, 100, "Start Helium", Color.white, 37, 70);
+        returnToLauncher = new CustomButton(0, 0, Runner.WIDTH/6, Runner.HEIGHT/15, "Return to Launcher", Color.white, 4, 30);
         this.addMouseListener(this);
         this.addMouseMotionListener(this);
 
@@ -47,14 +54,18 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     private void drawLoginState(Graphics g){
         //left side pink
+
+        g.setColor(Color.white);
+        g.fillRect(0, 0, Runner.WIDTH, Runner.HEIGHT);
+
         Graphics2D g2d = (Graphics2D) g.create();
         AlphaComposite alcom = AlphaComposite.getInstance(
-                AlphaComposite.SRC_OVER, (float) 0.05);
+                AlphaComposite.SRC_OVER, (float) 0.9);
         g2d.setComposite(alcom);
 
         g2d.setColor(Color.PINK);
         g2d.fillRect(0, 0, Runner.WIDTH*10/16, Runner.HEIGHT);
-        g2d.dispose();
+
 
 
 
@@ -88,15 +99,61 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         g.setFont(buttonFont);
         startButton.draw(g);
 
-
+        g2d.dispose();
 
 
     }
 
     private void drawHomeState(Graphics g){
 
+        Graphics2D g2d = (Graphics2D) g.create();
+        AlphaComposite alcom = AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER, (float) 0.98);
+        g2d.setComposite(alcom);
+
         g.setColor(Color.white);
         g.fillRect(0, 0, Runner.WIDTH, Runner.HEIGHT);
+
+
+
+        //wave
+        //https://1.bp.blogspot.com/-AA5UeZDeCXY/W-7Zr-i3GkI/AAAAAAAAa28/M-2Tm4nzX4Aw9EmzoZ6Hlgk2LWdBe_RGgCLcBGAs/s1600/cats-wallpaper-japan-art.jpg
+
+        try {
+            Image icon = new ImageIcon(new URL("https://cdn.dribbble.com/users/722246/screenshots/2105878/attachments/380895/Bays_Nights.jpg")).getImage();
+
+            Image newImage = icon.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+
+            g.drawImage(icon, -400, 0, this);
+
+
+        }catch(Exception e){
+            System.out.println("Could not get gif");
+        }
+
+
+
+
+
+        g.setColor(Color.pink);
+        g.fillRect(0,0,Runner.WIDTH/8, Runner.HEIGHT);
+
+        //draw Task bar
+        g2d.setColor(Color.darkGray);
+        g2d.fillRect(0,0, Runner.WIDTH, Runner.HEIGHT/15+2);
+
+        g.setColor(Color.pink);
+        g.fillRect(0,0, Runner.WIDTH, Runner.HEIGHT/15);
+
+
+
+
+        g.setFont(smallButtonFont);
+        returnToLauncher.draw(g);
+
+
+
+        g2d.dispose();
 
 
     }
@@ -119,7 +176,9 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
                 currentState = HOME_STATE;
             }
         }else if(currentState == HOME_STATE){
-
+            if(returnToLauncher.contains(e.getX(), e.getY())){
+                currentState = LOGIN_STATE;
+            }
         }
 
 
@@ -161,7 +220,11 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
                startButton.setTextColor(Color.WHITE);
            }
        }else if(currentState == HOME_STATE){
-
+           if (returnToLauncher.contains(e.getX(), e.getY())) {
+               returnToLauncher.setTextColor(Color.GRAY);
+           } else {
+               returnToLauncher.setTextColor(Color.WHITE);
+           }
        }
 
     }
