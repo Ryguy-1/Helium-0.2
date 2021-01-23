@@ -55,6 +55,7 @@ public class SeleniumBot {
 
     public void runBot() {
         driver.get(monitoringURL);
+        System.out.println("Gotten URL");
         pause(4);
         if (monitoringURL.contains("amazon")) {
             t1 = new Thread(() -> {
@@ -158,6 +159,7 @@ public class SeleniumBot {
                 while (true) {
                     while (isActive) {
                         while (!isAvailable) {
+                            System.out.println("Is not Available");
                             // when the product is not available and need to check when the product becomes
                             // available
                             try {
@@ -488,7 +490,7 @@ public class SeleniumBot {
 		//test invisible
 		if(!isVisible) {
             ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors", "--silent");
+            options.addArguments("--headless", "--silent");
             //end test
 
             driver = new ChromeDriver(options);// would put "options" as the parameter for testing

@@ -18,6 +18,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     public static final int LOGIN_STATE = 0;
     public static final int MONITORING_STATE = 1;
+    public static final int DISCORD_STATE = 3;
 
     //LOGIN_STATE
     private CustomButton startButton;
@@ -80,6 +81,8 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
             drawLoginState(g);
         } else if (currentState == MONITORING_STATE) {
             drawMonitoringState(g);
+        }else if(currentState == DISCORD_STATE){
+            drawDiscordState(g);
         }
 
     }
@@ -228,6 +231,63 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     }
 
+    private void drawDiscordState(Graphics g){
+
+        Graphics2D g2d = (Graphics2D) g.create();
+        AlphaComposite alcom = AlphaComposite.getInstance(
+                AlphaComposite.SRC_OVER, (float) 0.98);
+        g2d.setComposite(alcom);
+
+        g.setColor(Color.white);
+        g.fillRect(0, 0, Runner.WIDTH, Runner.HEIGHT);
+
+
+
+        //wave
+        //https://1.bp.blogspot.com/-AA5UeZDeCXY/W-7Zr-i3GkI/AAAAAAAAa28/M-2Tm4nzX4Aw9EmzoZ6Hlgk2LWdBe_RGgCLcBGAs/s1600/cats-wallpaper-japan-art.jpg
+
+        try {
+            Image icon = new ImageIcon(new URL("https://cdn.dribbble.com/users/722246/screenshots/2105878/attachments/380895/Bays_Nights.jpg")).getImage();
+
+            Image newImage = icon.getScaledInstance(100, 100, Image.SCALE_SMOOTH);
+
+            g.drawImage(icon, -400, 0, this);
+
+
+        }catch(Exception e){
+            System.out.println("Could not get gif");
+        }
+
+
+
+
+
+        g.setColor(Color.pink);
+        g.fillRect(0,0,Runner.WIDTH/12, Runner.HEIGHT);
+
+        //draw Task bar
+        g2d.setColor(Color.darkGray);
+        g2d.fillRect(0,0, Runner.WIDTH, Runner.HEIGHT/15+2);
+
+        g.setColor(Color.pink);
+        g.fillRect(0,0, Runner.WIDTH, Runner.HEIGHT/15);
+
+        g.setFont(smallButtonFont);
+        returnToLauncher.draw(g);
+        //
+        monitoringButton.draw(g);
+        //
+        bottingButton.draw(g);
+        discordButton.fill(g);
+        discordButton.draw(g);
+
+
+
+        g2d.dispose();
+
+
+    }
+
 
     private void updateActiveMonitors(){
 
@@ -290,8 +350,12 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         if(Runner.manager.hasAddedWebhook(webhookURL)){
             Runner.manager.addURLtoWebhook(webhookURL, websiteURL, isVisible);
         }else{
-            Runner.manager.addWebhook(webhookURL);
-            Runner.manager.addURLtoWebhook(webhookURL, websiteURL, isVisible);
+            if(Runner.manager.getWebhookManagerList().size()<=3) {
+                Runner.manager.addWebhook(webhookURL);
+                Runner.manager.addURLtoWebhook(webhookURL, websiteURL, isVisible);
+            }else{
+                System.out.println("Max out at 3 Webhooks sry lol");
+            }
         }
 
         updateActiveMonitors();
@@ -375,11 +439,11 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
             if(returnToLauncher.contains(e.getX(), e.getY())){
                 currentState = LOGIN_STATE;
             }else if(monitoringButton.contains(e.getX(), e.getY())){
-                //switch to monitors
+                currentState = MONITORING_STATE;
             }else if(bottingButton.contains(e.getX(), e.getY())){
                 //switch to botting
             }else if(discordButton.contains(e.getX(), e.getY())){
-                //switch to discord integration
+                currentState = DISCORD_STATE;
             }
         }
 
@@ -415,6 +479,14 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
             for (ActiveMonitor monitor: drawnMonitors){
                 if(monitor.getWebhookButton().contains(e.getX(), e.getY())){
                     JOptionPane.showMessageDialog(null, monitor.getWebhookURL());
+                }else if(monitor.getTargetButton().contains(e.getX(), e.getY())){
+                    JOptionPane.showMessageDialog(null, monitor.getTargetURLs());
+                }else if(monitor.getBestBuyButton().contains(e.getX(), e.getY())){
+                    JOptionPane.showMessageDialog(null, monitor.getBestBuyURLs());
+                }else if(monitor.getWalmartButton().contains(e.getX(), e.getY())){
+                    JOptionPane.showMessageDialog(null, monitor.getWalmartURLs());
+                }else if(monitor.getAmazonButton().contains(e.getX(), e.getY())){
+                    JOptionPane.showMessageDialog(null, monitor.getAmazonURLs());
                 }
             }
 
@@ -519,6 +591,32 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
                }else{
                    monitor.getWebhookButton().setTextColor(Color.WHITE);
                }
+                //website buttons
+               if(monitor.getTargetButton().contains(e.getX(), e.getY())){
+                   monitor.getTargetButton().setTextColor(Color.GRAY);
+               }else{
+                   monitor.getTargetButton().setTextColor(Color.WHITE);
+               }
+
+               if(monitor.getBestBuyButton().contains(e.getX(), e.getY())){
+                   monitor.getBestBuyButton().setTextColor(Color.GRAY);
+               }else{
+                   monitor.getBestBuyButton().setTextColor(Color.WHITE);
+               }
+
+               if(monitor.getWalmartButton().contains(e.getX(), e.getY())){
+                   monitor.getWalmartButton().setTextColor(Color.GRAY);
+               }else{
+                   monitor.getWalmartButton().setTextColor(Color.WHITE);
+               }
+
+               if(monitor.getAmazonButton().contains(e.getX(), e.getY())){
+                   monitor.getAmazonButton().setTextColor(Color.GRAY);
+               }else{
+                   monitor.getAmazonButton().setTextColor(Color.WHITE);
+               }
+
+
            }
 
 

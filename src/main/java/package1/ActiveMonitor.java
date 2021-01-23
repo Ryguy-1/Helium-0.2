@@ -87,8 +87,8 @@ public class ActiveMonitor {
 
 
         ////////////////////////Show Hitbox
-        g.setColor(Color.GREEN);//shows hitboxes
-        g.drawRect(x, y, width, height);
+//        g.setColor(Color.GREEN);//shows hitboxes
+//        g.drawRect(x, y, width, height);
         /////////////////////////////////
 
         g.setColor(Color.GRAY);
@@ -127,9 +127,97 @@ public class ActiveMonitor {
         return this.getWebhook;
     }
 
+    public CustomButton getTargetButton(){
+        return this.target;
+    }
+    public CustomButton getBestBuyButton(){
+        return this.bestBuy;
+    }
+    public CustomButton getWalmartButton(){
+        return this.walmart;
+    }
+    public CustomButton getAmazonButton(){
+        return this.amazon;
+    }
+
     public String getWebhookURL(){
         return this.webhookURL;
     }
+
+
+
+    public String getTargetURLs(){
+        String targetURLs = "";
+        int counter = 1;
+        for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
+            //iterates over all the webhookseleniummaangers
+            if(w.getwebhookURL().equals(webhookURL)){
+                for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
+                    //set numbers of each link
+                    if(w.getMonitoringLinks().get(i).contains("target")){
+                        targetURLs+= counter+") "+ w.getMonitoringLinks().get(i) + "\n";
+                        counter++;
+                    }
+                }
+            }
+        }
+        return targetURLs;
+    }
+
+    public String getWalmartURLs(){
+        String walmartURLs = "";
+        int counter = 1;
+        for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
+            //iterates over all the webhookseleniummaangers
+            if(w.getwebhookURL().equals(webhookURL)){
+                for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
+                    //set numbers of each link
+                    if(w.getMonitoringLinks().get(i).contains("walmart")){
+                        walmartURLs+= counter+") "+ w.getMonitoringLinks().get(i) + "\n";
+                        counter++;
+                    }
+                }
+            }
+        }
+        return walmartURLs;
+    }
+
+    public String getAmazonURLs(){
+        String amazonURLs = "";
+        int counter = 1;
+        for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
+            //iterates over all the webhookseleniummaangers
+            if(w.getwebhookURL().equals(webhookURL)){
+                for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
+                    //set numbers of each link
+                    if(w.getMonitoringLinks().get(i).contains("amazon")){
+                        amazonURLs+= counter+") "+ w.getMonitoringLinks().get(i) + "\n";
+                        counter++;
+                    }
+                }
+            }
+        }
+        return amazonURLs;
+    }
+
+    public String getBestBuyURLs(){
+        String bestBuyURLs = "";
+        int counter = 1;
+        for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
+            //iterates over all the webhookseleniummaangers
+            if(w.getwebhookURL().equals(webhookURL)){
+                for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
+                    //set numbers of each link
+                    if(w.getMonitoringLinks().get(i).contains("bestbuy")){
+                        bestBuyURLs+= counter+") "+ w.getMonitoringLinks().get(i) + "\n";
+                        counter++;
+                    }
+                }
+            }
+        }
+        return bestBuyURLs;
+    }
+
 
     public boolean contains(int mouseX, int mouseY) {
         //if mouseX is right of x of the button AND left right of button (x+width)    ((THEN SAME THING FOR Y))

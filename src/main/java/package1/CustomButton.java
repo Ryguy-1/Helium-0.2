@@ -31,8 +31,8 @@ public class CustomButton {
 
     public void draw(Graphics g){
         ////////////////////////Show Hitbox
-        g.setColor(Color.GREEN);//shows hitboxes
-        g.drawRect(x, y, width, height);
+//        g.setColor(Color.GREEN);//shows hitboxes
+//        g.drawRect(x, y, width, height);
         /////////////////////////////////
 
 
