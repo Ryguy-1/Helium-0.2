@@ -48,13 +48,46 @@ public class WebHookSeleniumManager {
         this.channel = channel;
     }
 
+    public ArrayList<String> getMonitoringLinks(){
+        return this.monitoringLinks;
+    }
 
+    public String getwebhookURL(){
+        return this.webhookURL;
+    }
 
-    public void addMonitor(String URL){
-        monitoringLinks.add(URL);
-        botsLocal.add(new SeleniumBot(URL)); // creates a new, local, non stock bot.
-        botsLocal.get(botsLocal.size() - 1).addManager(this); // adds this webhook as a manager for that bot.
-        botsLocal.get(botsLocal.size()-1).setIsActiveTrue();
+    public void addMonitor(String URL, boolean isVisible){
+        boolean hasURL = false;
+        for(String s: monitoringLinks){
+            if(s.equals(URL)){
+                hasURL = true;
+            }
+        }
+        //only lets you add the URL if it doesn't already exist
+        if(!hasURL) {
+            monitoringLinks.add(URL);
+            botsLocal.add(new SeleniumBot(URL, isVisible)); // creates a new, local, non stock bot.
+            botsLocal.get(botsLocal.size() - 1).addManager(this); // adds this webhook as a manager for that bot.
+            botsLocal.get(botsLocal.size() - 1).setIsActiveTrue();
+        }else{
+            System.out.println("Already Have This URL in This Webhook");
+        }
+    }
+
+    public void removeMonitor(String URL){
+        boolean removed = false;
+        for (int i = 0; i < monitoringLinks.size(); i++) {
+            if(monitoringLinks.get(i).equals(URL)){
+                monitoringLinks.remove(i);
+                botsLocal.get(i).removeManager(this);
+                botsLocal.get(i).quitBot();
+                botsLocal.remove(i);
+                removed = true;
+            }
+        }
+        if(!removed){
+            System.out.println("Not removed because never added!");
+        }
     }
 
 
@@ -66,7 +99,7 @@ public class WebHookSeleniumManager {
         } else if (command.contains("https://www.") && addingProductURL && !monitoringLinks.contains(command)) {
             try{channel.sendMessage("Creating new Monitor... Please wait").queue();}catch(Exception e){}
             monitoringLinks.add(command);
-            botsLocal.add(new SeleniumBot(command)); // creates a new, local, non stock bot.
+            botsLocal.add(new SeleniumBot(command, false)); // creates a new, local, non stock bot. -> CHANGE THIS IS VISIBLE THING LATER
             botsLocal.get(botsLocal.size() - 1).addManager(this); // adds this webhook as a manager for that bot.
             botsLocal.get(botsLocal.size()-1).setIsActiveTrue();
             addingProductURL = false;
@@ -81,14 +114,12 @@ public class WebHookSeleniumManager {
     public void removeOutputs() {
 
         //removes private bots
-        for (int i = 0; i < monitoringLinks.size(); i++) {
-            monitoringLinks.remove(i);
-        }
+        monitoringLinks.clear();
         for (int i = 0; i < botsLocal.size(); i++) {
             botsLocal.get(i).removeManager(this);
             botsLocal.get(i).quitBot();
-            botsLocal.remove(i);
         }
+        botsLocal.clear();
     }
 
     public void sendProductAvailable(String URL, String price, String website, boolean isRestock, boolean isPriceChange,
@@ -134,7 +165,11 @@ public class WebHookSeleniumManager {
                 }catch(Exception e) {
                     skuTemp = URL.substring(URL.length()-8);
                 }
+
+                System.out.println("Price = "+price + " SKU = "+SKU + " ImageURL = "+imageURL+ " Title = "+productTitle);
+                //productTitle = "test test"; //very temporary line change back immediately after big fix
                 if (price.contains("$")) {
+
                     hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
                             .addField("**Price**", price, true)
                             .addField("**SKU**", skuTemp, true).setThumbnail(imageURL)
@@ -186,9 +221,10 @@ public class WebHookSeleniumManager {
                 hook.execute();
             } catch (IOException e) {
                 // TODO Auto-generated catch block
-                e.printStackTrace();
+                //e.printStackTrace();
+                sendProductAvailable(URL, price, website, isRestock, isPriceChange, "Product from: "+website, imageURL, SKU, logo);
                 try{channel.sendMessage(
-                        "Could Not Execute Webhook. Please report error and developers will fix as soon as possible!")
+                        "Could Not Execute Webhook Properly. Please report error and developers will fix as soon as possible!")
                         .queue();}catch(Exception e2){}
             }
         }

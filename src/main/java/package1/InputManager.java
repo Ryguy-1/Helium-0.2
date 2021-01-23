@@ -1,6 +1,7 @@
 package package1;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.api.JDA;
@@ -43,28 +44,60 @@ public class InputManager extends ListenerAdapter {
 
     }
 
+    public ArrayList<WebHookSeleniumManager> getWebhookManagerList(){
+        return this.webhookManagerList;
+    }
+
 
     public void addWebhook(String URL){
         try {
-            webhookManagerList.add(new WebHookSeleniumManager(URL, null));
-            webhookURLList.add(URL);
+            if(webhookManagerList.size()<=3) {
+                webhookManagerList.add(new WebHookSeleniumManager(URL, null));
+                webhookURLList.add(URL);
+            }else{
+                System.out.println("Cannot have more than 3 Webhooks");
+            }
         } catch (Exception e) {
             System.out.println("Not a Valid Webhook URL");
         }
     }
 
 
-    public void addURLtoWebhook(String webhookToAddToURL, String websiteURL){
+    public void addURLtoWebhook(String webhookToAddToURL, String websiteURL, boolean isVisible){
+        boolean added = false;
         if(websiteURL.contains("amazon") || websiteURL.contains("bestbuy") || websiteURL.contains("target") || websiteURL.contains("walmart")) {
             for (int j = 0; j < webhookURLList.size(); j++) {
                 if (webhookURLList.get(j).equals(webhookToAddToURL)) {
-                    webhookManagerList.get(j).addMonitor(websiteURL);
+                    webhookManagerList.get(j).addMonitor(websiteURL, isVisible);
+                    added = true;
                 }
             }
         }else{
             System.out.println("Not a valid Website URL");
         }
+        if(!added){
+            System.out.println("Was not added because Webhook has Not been Initialized Yet");
+        }
     }
+
+
+    public void removeURLfromWebhook(String webhookToRemoveFromURL, String websiteURL){
+        boolean removed = false;
+        if(websiteURL.contains("amazon") || websiteURL.contains("bestbuy") || websiteURL.contains("target") || websiteURL.contains("walmart")) {
+            for (int j = 0; j < webhookURLList.size(); j++) {
+                if (webhookURLList.get(j).equals(webhookToRemoveFromURL)) {
+                    webhookManagerList.get(j).removeMonitor(websiteURL);
+                    removed = true;
+                }
+            }
+        }else{
+            System.out.println("Not a valid Website URL");
+        }
+        if(!removed){
+            System.out.println("Was not added because Webhook has Not been Initialized Yet");
+        }
+    }
+
 
     public void removeWebhook(String webhookURL){
         for (int i = 0; i < webhookURLList.size(); i++) {

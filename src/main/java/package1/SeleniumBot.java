@@ -25,6 +25,7 @@ public class SeleniumBot {
     private boolean isAvailable;
     private int currentPrice;
     private boolean isActive;
+    private boolean isVisible;
 
 
     //Timings For How Long to Wait for Different Retailers -> If wrong can cause false positives or time an IP out. These work well as Stock. Adjust at Your Own Risk
@@ -41,10 +42,11 @@ public class SeleniumBot {
     public static int walmartOut = 120;
 
 
-    SeleniumBot(String monitoringURL) {
+    SeleniumBot(String monitoringURL, boolean isVisible) {
         this.monitoringURL = monitoringURL;
         currentPrice = 0;
         isActive = false;
+        this.isVisible = isVisible;
         this.myManagers = new ArrayList<>();
         initializeBot();
         runBot();
@@ -483,20 +485,18 @@ public class SeleniumBot {
     }
 
     public void initializeBot() {
-//		//test invisible
-//		if(!Runner.box.isSelected()) {
-//            ChromeOptions options = new ChromeOptions();
-//            options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors", "--silent");
-//            //end test
-//
-//            driver = new ChromeDriver(options);// would put "options" as the parameter for testing
-//            resizeWindow(driver, 1500, 800);
-//        }else{
-//            driver = new ChromeDriver();// would put "options" as the parameter for testing
-//            resizeWindow(driver, 1500, 800);
-//        }
-        driver = new ChromeDriver();// would put "options" as the parameter for testing
-        resizeWindow(driver, 1500, 800);
+		//test invisible
+		if(!isVisible) {
+            ChromeOptions options = new ChromeOptions();
+            options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors", "--silent");
+            //end test
+
+            driver = new ChromeDriver(options);// would put "options" as the parameter for testing
+            resizeWindow(driver, 1500, 800);
+        }else{
+            driver = new ChromeDriver();// would put "options" as the parameter for testing
+            resizeWindow(driver, 1500, 800);
+        }
 
 
 

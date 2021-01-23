@@ -1,12 +1,12 @@
 package package1;
 
-import javax.imageio.ImageIO;
+import net.bytebuddy.dynamic.TypeResolutionStrategy;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.net.URL;
+import java.util.ArrayList;
 
 public class AppPanel extends JPanel implements ActionListener, MouseListener, MouseMotionListener {
 
@@ -14,6 +14,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
     private Font titleFont;
     private Font buttonFont;
     private Font smallButtonFont;
+    private Font superSmallButtonFont;
 
     public static final int LOGIN_STATE = 0;
     public static final int MONITORING_STATE = 1;
@@ -29,8 +30,15 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     //MONITORING_STATE
     private CustomButton addMonitor;
+    private CustomButton removeMonitor;
     private CustomButton viewMonitors;
+    private CustomButton removeWebhook;
     private boolean viewingMonitors;
+    private boolean addingMonitors;
+    private boolean removingMonitors;
+    private boolean removingWebhook;
+    private ArrayList<ActiveMonitor> drawnMonitors;
+
 
 
     public static int currentState;
@@ -43,6 +51,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         titleFont = new Font("Impact", Font.PLAIN, 78);
         buttonFont = new Font("Impact", Font.PLAIN, 48);
         smallButtonFont = new Font("Impact", Font.PLAIN, 25);
+        superSmallButtonFont = new Font("Impact", Font.PLAIN, 20);
         //LOGIN_STATE
         startButton = new CustomButton(Runner.WIDTH*11/16, Runner.HEIGHT*1/6, 300, 100, "Start Helium", Color.white, 37, 70);
         //!LOGIN_STATE
@@ -51,9 +60,15 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         bottingButton = new CustomButton(Runner.WIDTH*2/4, 0, Runner.WIDTH/4, Runner.HEIGHT/15, "Botting", Color. white, 111, 30);
         discordButton = new CustomButton(Runner.WIDTH*3/4, 0, Runner.WIDTH/4, Runner.HEIGHT/15, "Discord Integration", Color. white, 50, 30);
         //MONITORING_STATE
-        viewMonitors = new CustomButton(0, Runner.HEIGHT*0/2+Runner.HEIGHT/15, Runner.WIDTH/16, Runner.HEIGHT/2-Runner.HEIGHT/15, "View", Color. white, 12, 150);
-        addMonitor = new CustomButton(0, Runner.HEIGHT*1/2, Runner.WIDTH/16, Runner.HEIGHT/2, "Add+", Color. white, 12, 150);
+        viewMonitors = new CustomButton(0, Runner.HEIGHT*0/3+Runner.HEIGHT/15, Runner.WIDTH/12, Runner.HEIGHT/3-Runner.HEIGHT/15, "View", Color. white, 25, 100);
+        addMonitor = new CustomButton(0, Runner.HEIGHT*1/3, Runner.WIDTH/12, Runner.HEIGHT/3, "Add+", Color. white, 25, 120);
+        removeMonitor = new CustomButton(0, Runner.HEIGHT*2/3, Runner.WIDTH/12, Runner.HEIGHT/3, "Remove-", Color.white, 5, 100);
+        removeWebhook = new CustomButton(Runner.WIDTH*3/4, Runner.HEIGHT*5/6, Runner.WIDTH/4, Runner.HEIGHT/6, "Remove Entire Webhook --", Color.white, 10, 50);
         viewingMonitors = true;
+        addingMonitors = false;
+        removingMonitors = false;
+        removingWebhook = false;
+        drawnMonitors = new ArrayList<ActiveMonitor>();
 
 
     }
@@ -155,7 +170,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
 
         g.setColor(Color.pink);
-        g.fillRect(0,0,Runner.WIDTH/16, Runner.HEIGHT);
+        g.fillRect(0,0,Runner.WIDTH/12, Runner.HEIGHT);
 
         //draw Task bar
         g2d.setColor(Color.darkGray);
@@ -173,16 +188,35 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         bottingButton.draw(g);
         discordButton.draw(g);
 
+        for(ActiveMonitor active: drawnMonitors){
+            active.draw(g);
+        }
 
 
         if(viewingMonitors){
             viewMonitors.fill(g);
             viewMonitors.draw(g);
             addMonitor.draw(g);
-        }else{
+            removeMonitor.draw(g);
+            removeWebhook.draw(g);
+        }else if(addingMonitors){
             viewMonitors.draw(g);
             addMonitor.fill(g);
             addMonitor.draw(g);
+            removeMonitor.draw(g);
+            removeWebhook.draw(g);
+        }else if(removingMonitors){
+            viewMonitors.draw(g);
+            addMonitor.draw(g);
+            removeMonitor.fill(g);
+            removeMonitor.draw(g);
+            removeWebhook.draw(g);
+        }else if(removingWebhook){
+            viewMonitors.draw(g);
+            addMonitor.draw(g);
+            removeMonitor.draw(g);
+            removeWebhook.fill(g);
+            removeWebhook.draw(g);
         }
 
 
@@ -192,9 +226,46 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     }
 
+
+    private void updateActiveMonitors(){
+
+        //drawnMonitors;
+
+        drawnMonitors.clear();
+
+        //Sidebar = Width/12
+        //Topbar = Height/15
+
+        //goes to 3 max as you can only have 3 webhooks right now...
+//        for (int i = 0; i < Runner.manager.getWebhookManagerList().size(); i++){
+//            drawnMonitors.add(new ActiveMonitor((Runner.WIDTH/12)+(Runner.WIDTH*11/12)*(i/3), Runner.HEIGHT*2/15, (Runner.WIDTH - Runner.WIDTH/12)*1/3-20, ((Runner.HEIGHT-Runner.HEIGHT/15)-Runner.HEIGHT*2/15), Color.white,
+//                    Runner.manager.getWebhookManagerList().get(i).getwebhookURL()));
+//        }
+        //done this way for now. Will make expandable later. Just not working how I would like it with the other algorithm so do this to save time!
+        if(Runner.manager.getWebhookManagerList().size()>=1){
+                        drawnMonitors.add(new ActiveMonitor((Runner.WIDTH/12)+ 10, Runner.HEIGHT*2/15, (Runner.WIDTH - Runner.WIDTH/12)*1/3-20, ((Runner.HEIGHT-Runner.HEIGHT/15)-Runner.HEIGHT*2/15), Color.white,
+                    Runner.manager.getWebhookManagerList().get(0).getwebhookURL()));
+        }
+        if(Runner.manager.getWebhookManagerList().size()>=2){
+            drawnMonitors.add(new ActiveMonitor((Runner.WIDTH/12)+ 20 + (Runner.WIDTH - Runner.WIDTH/12)*1/3-20, Runner.HEIGHT*2/15, (Runner.WIDTH - Runner.WIDTH/12)*1/3-20, ((Runner.HEIGHT-Runner.HEIGHT/15)-Runner.HEIGHT*2/15), Color.white,
+                    Runner.manager.getWebhookManagerList().get(1).getwebhookURL()));
+        }
+        if(Runner.manager.getWebhookManagerList().size()==3){
+            drawnMonitors.add(new ActiveMonitor((Runner.WIDTH/12)+ 30 + 2*((Runner.WIDTH - Runner.WIDTH/12)*1/3-20), Runner.HEIGHT*2/15, (Runner.WIDTH - Runner.WIDTH/12)*1/3-20, ((Runner.HEIGHT-Runner.HEIGHT/15)-Runner.HEIGHT*2/15), Color.white,
+                    Runner.manager.getWebhookManagerList().get(2).getwebhookURL()));
+        }
+
+    }
+
+
+
+
+
+
     private void addMonitor(){
         String webhookURL, websiteURL;
         webhookURL = ""; websiteURL = "";
+        boolean isVisible = false;
 
         try {
             webhookURL = (String) JOptionPane.showInputDialog(null, "Webhook URL",
@@ -202,17 +273,83 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
             websiteURL = (String) JOptionPane.showInputDialog(null, "URL (BestBuy, Target, Amazon, or Walmart)",
                     "Please Enter the URL for the Website", JOptionPane.QUESTION_MESSAGE);
+
+
+
+            if (JOptionPane.showConfirmDialog(null, "Do You Want the Chrome Window to Be Visible?", "Set Visibility",
+                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                isVisible = true;
+            } else {
+                isVisible = false;
+            }
+
         }catch(Exception e){}
 
-        Runner.manager.addWebhook(webhookURL);
-        Runner.manager.addURLtoWebhook(webhookURL, websiteURL);
+        if(Runner.manager.hasAddedWebhook(webhookURL)){
+            Runner.manager.addURLtoWebhook(webhookURL, websiteURL, isVisible);
+        }else{
+            Runner.manager.addWebhook(webhookURL);
+            Runner.manager.addURLtoWebhook(webhookURL, websiteURL, isVisible);
+        }
 
-
-
+        updateActiveMonitors();
 
         viewingMonitors = true;
 
 
+
+    }
+
+
+    private void removeMonitor(){
+
+        String webhookURL, websiteURL;
+        webhookURL = ""; websiteURL = "";
+
+
+        try {
+            webhookURL = (String) JOptionPane.showInputDialog(null, "Webhook URL",
+                    "Please Enter the Webhook URL to Remove From", JOptionPane.QUESTION_MESSAGE);
+
+            websiteURL = (String) JOptionPane.showInputDialog(null, "URL (BestBuy, Target, Amazon, or Walmart)",
+                    "Please Enter the URL for the Website to Remove", JOptionPane.QUESTION_MESSAGE);
+        }catch(Exception e){}
+
+
+        if(Runner.manager.hasAddedWebhook(webhookURL)){
+            Runner.manager.removeURLfromWebhook(webhookURL, websiteURL);
+        }else{
+            System.out.println("Have not initiated Webhook Yet!");
+        }
+
+        updateActiveMonitors();
+
+        viewingMonitors = true;
+
+    }
+
+
+    private void removeWebhook(){
+
+        String webhookURL = "";
+
+
+        try {
+            webhookURL = (String) JOptionPane.showInputDialog(null, "Webhook URL",
+                    "Please Enter the Webhook URL to Remove Entirely", JOptionPane.QUESTION_MESSAGE);
+
+        }catch(Exception e){}
+
+
+        if(Runner.manager.hasAddedWebhook(webhookURL)){
+            Runner.manager.removeWebhook(webhookURL);
+        }else{
+            System.out.println("Webhook Has Not Been Initialized Yet!");
+        }
+
+        updateActiveMonitors();
+
+        viewingMonitors = true;
     }
 
 
@@ -249,10 +386,28 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
             if(viewMonitors.contains(e.getX(), e.getY())){
                 //viewing monitors
                 viewingMonitors = true;
+                addingMonitors = false;
+                removingMonitors = false;
+                removingWebhook = false;
             }else if(addMonitor.contains(e.getX(), e.getY())){
                 //add monitor
                 viewingMonitors = false;
+                addingMonitors = true;
+                removingMonitors = false;
+                removingWebhook = false;
                 addMonitor();
+            }else if(removeMonitor.contains(e.getX(), e.getY())){
+                viewingMonitors = false;
+                addingMonitors = false;
+                removingMonitors = true;
+                removingWebhook = false;
+                removeMonitor();
+            }else if(removeWebhook.contains(e.getX(), e.getY())){
+                viewingMonitors = false;
+                addingMonitors = false;
+                removingMonitors = false;
+                removingWebhook = true;
+                removeWebhook();
             }
         }
 
@@ -335,6 +490,19 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
            }else{
                addMonitor.setTextColor(Color.WHITE);
            }
+
+           if(removeMonitor.contains(e.getX(), e.getY())){
+               removeMonitor.setTextColor(Color.GRAY);
+           }else{
+               removeMonitor.setTextColor(Color.WHITE);
+           }
+
+           if(removeWebhook.contains(e.getX(), e.getY())){
+               removeWebhook.setTextColor(Color.GRAY);
+           }else{
+               removeWebhook.setTextColor(Color.WHITE);
+           }
+
 
        }
 
