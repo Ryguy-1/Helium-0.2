@@ -30,8 +30,8 @@ public class CustomButton {
 
     public void draw(Graphics g){
         ////////////////////////Show Hitbox
-//        g.setColor(Color.GREEN);//shows hitboxes
-//        g.drawRect(x, y, width, height);
+        g.setColor(Color.GREEN);//shows hitboxes
+        g.drawRect(x, y, width, height);
         /////////////////////////////////
 
 
@@ -39,6 +39,12 @@ public class CustomButton {
         g.drawString(text, x+offsetX, y+offsetY);
 
     }
+
+    public void fill(Graphics g){
+        g.setColor(new Color(58, 126, 166));
+        g.fillRect(x, y, width, height);
+    }
+
 
     public void setTextColor(Color color){
         this.textColor = color;
