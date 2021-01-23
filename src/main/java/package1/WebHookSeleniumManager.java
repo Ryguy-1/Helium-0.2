@@ -39,7 +39,7 @@ public class WebHookSeleniumManager {
         monitoringLinks = new ArrayList<String>();
         botsLocal = new ArrayList<SeleniumBot>();
         hook = new DiscordWebhook(webhookURL);
-        hook.setContent("The Webhook added to this channel!");
+        hook.setContent("Channel Recognized by Helium");
         hook.execute();
         hook.setContent("");
     }
@@ -48,23 +48,33 @@ public class WebHookSeleniumManager {
         this.channel = channel;
     }
 
+
+
+    public void addMonitor(String URL){
+        monitoringLinks.add(URL);
+        botsLocal.add(new SeleniumBot(URL)); // creates a new, local, non stock bot.
+        botsLocal.get(botsLocal.size() - 1).addManager(this); // adds this webhook as a manager for that bot.
+        botsLocal.get(botsLocal.size()-1).setIsActiveTrue();
+    }
+
+
+
     public void sendCommand(String command) {
         if (command.equals("!Add URL") && !addingProductURL) {
-            channel.sendMessage(
-                    "Please enter the URL as the command parameter for the product you would like to monitor.").queue();
+            try{channel.sendMessage("Please enter the URL as the command parameter for the product you would like to monitor.").queue();}catch(Exception e){}
             addingProductURL = true;
         } else if (command.contains("https://www.") && addingProductURL && !monitoringLinks.contains(command)) {
-            channel.sendMessage("Creating new Monitor... Please wait").queue();
+            try{channel.sendMessage("Creating new Monitor... Please wait").queue();}catch(Exception e){}
             monitoringLinks.add(command);
             botsLocal.add(new SeleniumBot(command)); // creates a new, local, non stock bot.
             botsLocal.get(botsLocal.size() - 1).addManager(this); // adds this webhook as a manager for that bot.
             botsLocal.get(botsLocal.size()-1).setIsActiveTrue();
             addingProductURL = false;
-            channel.sendMessage("Monitor Successfully Created!").queue();
+                try{channel.sendMessage("Monitor Successfully Created!").queue();}catch(Exception e){}
         }else if (command.equalsIgnoreCase("!Help")) {
             System.out.println("HELP WEBHOOK");
-            channel.sendMessage("Webhook edit commands: \n!Add URL   -   Add a URL for the webhook to monitor.")
-                    .queue();
+                    try{channel.sendMessage("Webhook edit commands: \n!Add URL   -   Add a URL for the webhook to monitor.")
+                    .queue();}catch(Exception e){}
         }
     }
 
@@ -177,9 +187,9 @@ public class WebHookSeleniumManager {
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                channel.sendMessage(
+                try{channel.sendMessage(
                         "Could Not Execute Webhook. Please report error and developers will fix as soon as possible!")
-                        .queue();
+                        .queue();}catch(Exception e2){}
             }
         }
     }

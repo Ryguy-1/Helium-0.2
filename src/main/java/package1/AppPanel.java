@@ -194,17 +194,18 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     private void addMonitor(){
         String webhookURL, websiteURL;
+        webhookURL = ""; websiteURL = "";
 
+        try {
+            webhookURL = (String) JOptionPane.showInputDialog(null, "Webhook URL",
+                   "Please Enter the Webhook URL", JOptionPane.QUESTION_MESSAGE);
 
-        webhookURL = (String)JOptionPane.showInputDialog(null, "Webhook URL",
-                "Please Enter the Webhook URL", JOptionPane.QUESTION_MESSAGE);
+            websiteURL = (String) JOptionPane.showInputDialog(null, "URL (BestBuy, Target, Amazon, or Walmart)",
+                    "Please Enter the URL for the Website", JOptionPane.QUESTION_MESSAGE);
+        }catch(Exception e){}
 
-        websiteURL = (String)JOptionPane.showInputDialog(null, "(BestBuy, Target, Amazon, or Walmart)",
-                "Please Enter the URL for the Website", JOptionPane.QUESTION_MESSAGE);
-
-
-
-
+        Runner.manager.addWebhook(webhookURL);
+        Runner.manager.addURLtoWebhook(webhookURL, websiteURL);
 
 
 

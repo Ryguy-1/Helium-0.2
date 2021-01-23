@@ -17,8 +17,10 @@ public class Runner{
     public static final int WIDTH = 1200;
     public static final int HEIGHT = 700;
 
-    public static ArrayList<String> guildIds;
-    public static ArrayList<InputManager> managers;
+    //public static ArrayList<String> guildIds;
+    //public static ArrayList<InputManager> managers;
+    public static String guildId;
+    public static InputManager manager;
 
     public static JFrame frame;
     public static AppPanel panel;
@@ -29,13 +31,15 @@ public class Runner{
 
 //    public static JTextField key = new JTextField("Discord API Key Here");
 
-    GeneralInputManager generalManager;
+    //GeneralInputManager generalManager;
 
     public static void main(String[] args) throws LoginException, IOException {
 
         // RUNNER CODE
-        guildIds = new ArrayList<String>();
-        managers = new ArrayList<InputManager>();
+//        guildIds = new ArrayList<String>();
+//        managers = new ArrayList<InputManager>();
+        guildId = "";
+        manager = new InputManager();
 
         System.setProperty("webdriver.chrome.driver", "C:\\Selenium\\chromedriver.exe");
 

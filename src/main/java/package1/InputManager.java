@@ -3,38 +3,104 @@ package package1;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import java.io.IOException;
 
+import javax.security.auth.login.LoginException;
+
+import net.dv8tion.jda.api.JDA;
+import net.dv8tion.jda.api.JDABuilder;
+
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 //takes the guild's input message and sends the commands to 1.add a new WebHookSeleniumManager to a channel.
 //also sends the command to add a new URL to the WebHookSeleniumManager class to add the URL to the list it is monitoring.
-public class InputManager {
+public class InputManager extends ListenerAdapter {
+
+    //Discord
+    private String guildId;
+    private JDA jda;
+
+
 
     private MessageChannel channel;
 
-    private String guildId;
     private ArrayList<String> webhookURLList;
     private ArrayList<WebHookSeleniumManager> webhookManagerList;
     private boolean adding;
     private boolean removing;
 
-    InputManager(String guildId) {
+    InputManager() {
 
         webhookManagerList = new ArrayList<>();
         webhookURLList = new ArrayList<>();
         adding = false;
         removing = false;
-        this.guildId = guildId;
 
     }
+
+
+    public void addWebhook(String URL){
+        try {
+            webhookManagerList.add(new WebHookSeleniumManager(URL, null));
+            webhookURLList.add(URL);
+        } catch (Exception e) {
+            System.out.println("Not a Valid Webhook URL");
+        }
+    }
+
+
+    public void addURLtoWebhook(String webhookToAddToURL, String websiteURL){
+        if(websiteURL.contains("amazon") || websiteURL.contains("bestbuy") || websiteURL.contains("target") || websiteURL.contains("walmart")) {
+            for (int j = 0; j < webhookURLList.size(); j++) {
+                if (webhookURLList.get(j).equals(webhookToAddToURL)) {
+                    webhookManagerList.get(j).addMonitor(websiteURL);
+                }
+            }
+        }else{
+            System.out.println("Not a valid Website URL");
+        }
+    }
+
+    public void removeWebhook(String webhookURL){
+        for (int i = 0; i < webhookURLList.size(); i++) {
+            if(webhookURLList.get(i).equals(webhookURL)) {
+                webhookManagerList.get(i).removeOutputs();
+                webhookManagerList.remove(i);
+                webhookURLList.remove(i);
+            }
+        }
+    }
+
+
+    public boolean hasAddedWebhook(String tempWebhookURL){
+        for (String s: webhookURLList) {
+            if(s.equals(tempWebhookURL)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     public String getGuildId() {
         return guildId;
     }
 
-    public void sendEvent(MessageReceivedEvent event) throws IOException{
+    public void addDiscord(String key) throws LoginException {
+        guildId = "";
+        //Helium Restocks Code
+        jda = JDABuilder.createDefault(key)
+                .addEventListeners(this).build();
+
+    }
+
+    public void onMessageReceived(MessageReceivedEvent event) {
         Message msg = event.getMessage();
         channel = msg.getChannel();
 
