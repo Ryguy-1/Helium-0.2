@@ -14,6 +14,7 @@ public class CustomButton {
     private int offsetX;
     private int offsetY;
 
+
     CustomButton(int x, int y, int width, int height, String text, Color textColor, int offsetX, int offsetY){
         this.x = x;
         this.y = y;
@@ -30,8 +31,8 @@ public class CustomButton {
 
     public void draw(Graphics g){
         ////////////////////////Show Hitbox
-//        g.setColor(Color.GREEN);//shows hitboxes
-//        g.drawRect(x, y, width, height);
+        g.setColor(Color.GREEN);//shows hitboxes
+        g.drawRect(x, y, width, height);
         /////////////////////////////////
 
 
@@ -50,6 +51,13 @@ public class CustomButton {
         this.textColor = color;
     }
 
+    public String getText(){
+        return this.text;
+    }
+
+    public void setText(String text){
+        this.text = text;
+    }
 
     public boolean contains(int mouseX, int mouseY) {
         //if mouseX is right of x of the button AND left right of button (x+width)    ((THEN SAME THING FOR Y))

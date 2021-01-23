@@ -188,9 +188,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         bottingButton.draw(g);
         discordButton.draw(g);
 
-        for(ActiveMonitor active: drawnMonitors){
-            active.draw(g);
-        }
+
 
 
         if(viewingMonitors){
@@ -219,6 +217,10 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
             removeWebhook.draw(g);
         }
 
+
+        for(ActiveMonitor active: drawnMonitors){
+            active.draw(g);
+        }
 
 
         g2d.dispose();
@@ -409,6 +411,14 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
                 removingWebhook = true;
                 removeWebhook();
             }
+
+            for (ActiveMonitor monitor: drawnMonitors){
+                if(monitor.getWebhookButton().contains(e.getX(), e.getY())){
+                    JOptionPane.showMessageDialog(null, monitor.getWebhookURL());
+                }
+            }
+
+
         }
 
 
@@ -501,6 +511,14 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
                removeWebhook.setTextColor(Color.GRAY);
            }else{
                removeWebhook.setTextColor(Color.WHITE);
+           }
+
+           for(ActiveMonitor monitor: drawnMonitors){
+               if(monitor.getWebhookButton().contains(e.getX(), e.getY())){
+                   monitor.getWebhookButton().setTextColor(Color.GRAY);
+               }else{
+                   monitor.getWebhookButton().setTextColor(Color.WHITE);
+               }
            }
 
 
