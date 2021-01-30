@@ -18,8 +18,8 @@ public class ActiveMonitor {
     private int numTarget;
     private CustomButton bestBuy;
     private int numBestBuy;
-    private CustomButton walmart;
-    private int numWalmart;
+    //private CustomButton walmart;
+    //private int numWalmart;
     private CustomButton amazon;
     private int numAmazon;
     private Font buttonFont;
@@ -38,8 +38,9 @@ public class ActiveMonitor {
         //
         target = new CustomButton(x+10, y+height-height*4/8-48, width-20, height/8, "Target: ", Color.white, 30, 48);
         bestBuy = new CustomButton(x+10, y+height-height*3/8-36, width-20, height/8, "BestBuy: ", Color.white, 30, 48);
-        walmart = new CustomButton(x+10, y+height-height*2/8-24, width-20, height/8, "Walmart: ", Color.white, 30, 48);
-        amazon = new CustomButton(x+10, y+height-height*1/8-12, width-20, height/8, "Amazon: ", Color.white, 30, 48);
+        amazon = new CustomButton(x+10, y+height-height*2/8-24, width-20, height/8, "Amazon: ", Color.white, 30, 48);
+        //walmart = new CustomButton(x+10, y+height-height*1/8-12, width-20, height/8, "Walmart: ", Color.white, 30, 48);
+
 
         buttonFont = new Font("Impact", Font.PLAIN, 35);
         smallerFont = new Font("Impact", Font.PLAIN, 25);
@@ -47,7 +48,7 @@ public class ActiveMonitor {
 
         numTarget = 0;
         numBestBuy = 0;
-        numWalmart = 0;
+        //numWalmart = 0;
         numAmazon = 0;
 
     }
@@ -60,7 +61,7 @@ public class ActiveMonitor {
 
         for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
             //iterates over all the webhookseleniummaangers
-            if(w.getwebhookURL().equals(webhookURL)){
+            if(w.getWebhookURL().equals(webhookURL)){
                 URLs.clear();
                 for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
                     URLs.add(w.getMonitoringLinks().get(i));
@@ -71,15 +72,15 @@ public class ActiveMonitor {
                         numBestBuy++;
                     }else if(w.getMonitoringLinks().get(i).contains("target")){
                         numTarget++;
-                    }else if(w.getMonitoringLinks().get(i).contains("walmart")){
-                        numWalmart++;
-                    }
+                    }//else if(w.getMonitoringLinks().get(i).contains("walmart")){
+                        //numWalmart++;
+                    //}
                 }
             }
         }
         target.setText("Target: "+numTarget);
         bestBuy.setText("BestBuy: "+numBestBuy);
-        walmart.setText("Walmart: "+numWalmart);
+        //walmart.setText("Walmart: "+numWalmart);
         amazon.setText("Amazon: "+numAmazon);
 
 
@@ -104,8 +105,8 @@ public class ActiveMonitor {
         numTarget=0;
         bestBuy.draw(g);
         numBestBuy=0;
-        walmart.draw(g);
-        numWalmart=0;
+        //walmart.draw(g);
+        //numWalmart=0;
         amazon.draw(g);
         numAmazon=0;
 
@@ -133,9 +134,9 @@ public class ActiveMonitor {
     public CustomButton getBestBuyButton(){
         return this.bestBuy;
     }
-    public CustomButton getWalmartButton(){
-        return this.walmart;
-    }
+    //public CustomButton getWalmartButton(){
+        //return this.walmart;
+    //}
     public CustomButton getAmazonButton(){
         return this.amazon;
     }
@@ -151,7 +152,7 @@ public class ActiveMonitor {
         int counter = 1;
         for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
             //iterates over all the webhookseleniummaangers
-            if(w.getwebhookURL().equals(webhookURL)){
+            if(w.getWebhookURL().equals(webhookURL)){
                 for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
                     //set numbers of each link
                     if(w.getMonitoringLinks().get(i).contains("target")){
@@ -164,30 +165,30 @@ public class ActiveMonitor {
         return targetURLs;
     }
 
-    public String getWalmartURLs(){
-        String walmartURLs = "";
-        int counter = 1;
-        for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
-            //iterates over all the webhookseleniummaangers
-            if(w.getwebhookURL().equals(webhookURL)){
-                for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
-                    //set numbers of each link
-                    if(w.getMonitoringLinks().get(i).contains("walmart")){
-                        walmartURLs+= counter+") "+ w.getMonitoringLinks().get(i) + "\n";
-                        counter++;
-                    }
-                }
-            }
-        }
-        return walmartURLs;
-    }
+//    public String getWalmartURLs(){
+//        String walmartURLs = "";
+//        int counter = 1;
+//        for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
+//            //iterates over all the webhookseleniummaangers
+//            if(w.getWebhookURL().equals(webhookURL)){
+//                for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
+//                    //set numbers of each link
+//                    if(w.getMonitoringLinks().get(i).contains("walmart")){
+//                        walmartURLs+= counter+") "+ w.getMonitoringLinks().get(i) + "\n";
+//                        counter++;
+//                    }
+//                }
+//            }
+//        }
+//        return walmartURLs;
+//    }
 
     public String getAmazonURLs(){
         String amazonURLs = "";
         int counter = 1;
         for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
             //iterates over all the webhookseleniummaangers
-            if(w.getwebhookURL().equals(webhookURL)){
+            if(w.getWebhookURL().equals(webhookURL)){
                 for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
                     //set numbers of each link
                     if(w.getMonitoringLinks().get(i).contains("amazon")){
@@ -205,7 +206,7 @@ public class ActiveMonitor {
         int counter = 1;
         for( WebHookSeleniumManager w: Runner.manager.getWebhookManagerList()){
             //iterates over all the webhookseleniummaangers
-            if(w.getwebhookURL().equals(webhookURL)){
+            if(w.getWebhookURL().equals(webhookURL)){
                 for (int i = 0; i < w.getMonitoringLinks().size(); i++) {
                     //set numbers of each link
                     if(w.getMonitoringLinks().get(i).contains("bestbuy")){

@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import java.io.IOException;
 
 import javax.security.auth.login.LoginException;
+import javax.swing.*;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
@@ -59,21 +60,25 @@ public class InputManager extends ListenerAdapter {
             }
         } catch (Exception e) {
             System.out.println("Not a Valid Webhook URL");
+            JOptionPane.showMessageDialog(null, "Webhook Not Created Because Not a Valid Webhook URL");
         }
     }
 
 
     public void addURLtoWebhook(String webhookToAddToURL, String websiteURL, boolean isVisible){
         boolean added = false;
+        System.out.println("Here2");
         if(websiteURL.contains("amazon") || websiteURL.contains("bestbuy") || websiteURL.contains("target") || websiteURL.contains("walmart")) {
             for (int j = 0; j < webhookURLList.size(); j++) {
                 if (webhookURLList.get(j).equals(webhookToAddToURL)) {
+                    System.out.println("Here1");
                     webhookManagerList.get(j).addMonitor(websiteURL, isVisible);
                     added = true;
                 }
             }
         }else{
             System.out.println("Not a valid Website URL");
+            JOptionPane.showMessageDialog(null, "Not a valid Website URL");
         }
         if(!added){
             System.out.println("Was not added because Webhook has Not been Initialized Yet");
@@ -92,10 +97,12 @@ public class InputManager extends ListenerAdapter {
             }
         }else{
             System.out.println("Not a valid Website URL");
+            JOptionPane.showMessageDialog(null, "Not a valid Website URL");
         }
-        if(!removed){
-            System.out.println("Was not added because Webhook has Not been Initialized Yet");
-        }
+//        if(!removed){
+//            System.out.println("Was not removed because Webhook has Not been Initialized Yet");
+//            JOptionPane.showMessageDialog(null, "Was not removed because Webhook has Not been Initialized Yet");
+//        }
     }
 
 

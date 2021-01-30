@@ -13,6 +13,11 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 //also has a member variable as to which site it is monitoring to pass to the SeleniumBot.
 public class WebHookSeleniumManager {
 
+
+    private final Color webhookColor= new Color(237, 17, 96);
+    private final String footerMessage = "Powered By Helium Restocks";
+    private final String logo = "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png";
+
     private String webhookURL;
     private MessageChannel channel;
     private ArrayList<String> monitoringLinks;
@@ -52,7 +57,7 @@ public class WebHookSeleniumManager {
         return this.monitoringLinks;
     }
 
-    public String getwebhookURL(){
+    public String getWebhookURL(){
         return this.webhookURL;
     }
 
@@ -66,9 +71,12 @@ public class WebHookSeleniumManager {
         //only lets you add the URL if it doesn't already exist
         if(!hasURL) {
             monitoringLinks.add(URL);
+            System.out.println("Best Buy Bot Before Created And Set Active");
             botsLocal.add(new SeleniumBot(URL, isVisible)); // creates a new, local, non stock bot.
+            System.out.println("Best Buy Bot Has Been Created and set active");
             botsLocal.get(botsLocal.size() - 1).addManager(this); // adds this webhook as a manager for that bot.
             botsLocal.get(botsLocal.size() - 1).setIsActiveTrue();
+
         }else{
             System.out.println("Already Have This URL in This Webhook");
         }
@@ -122,99 +130,73 @@ public class WebHookSeleniumManager {
         botsLocal.clear();
     }
 
-    public void sendProductAvailable(String URL, String price, String website, boolean isRestock, boolean isPriceChange,
-                                     String productTitle, String imageURL, String SKU, String logo) {
+    public void sendProductAvailable(String URL, String price, String website, String productTitle, String imageURL, String SKU) {
 
+        //(String URL, String price, String website, boolean isRestock, boolean isPriceChange, String productTitle, String imageURL, String SKU, String logo) {
+
+        //title no more than 50 characters
         if(productTitle.length()>50) {
             productTitle = productTitle.substring(0, 50);
         }
 
+        //remove previous embeds from class before hand
         if (hook.getEmbedList().size() > 0) {
             hook.removeEmbeds();
         }
 
-        if (isRestock) {
-            hook.setUsername(website);
-            hook.setTts(true);
-            hook.setAvatarUrl("https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png");
+        //general embed presets
+        hook.setUsername(website);
+        hook.setTts(true);
+        hook.setAvatarUrl(logo);
 
 
             if (website.equals("Best Buy")) {
-                if (price.contains("$")) {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", price, true).setThumbnail(imageURL).setUrl(URL)
-                            .addField("**SKU**", SKU, true).setColor(new Color(237, 17, 96))
-                            .setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                } else {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", "$" + price, true).setThumbnail(imageURL).setUrl(URL)
-                            .addField("**SKU**", SKU, true).setColor(new Color(237, 17, 96))
-                            .setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                }
-
-
-
+                System.out.println("Sending BestBuy");
+                hook.addEmbed(new DiscordWebhook.EmbedObject()
+                        .setTitle(productTitle)
+                        .addField("**Price**", price, true)
+                        .addField("**SKU**", SKU, true)
+                        .setThumbnail(imageURL)
+                        .setUrl(URL)
+                        .setColor(webhookColor)
+                        .setFooter(footerMessage, logo));
             }
             else if (website.equals("Target")) {
-                String skuTemp;
-                try {
-                    Integer.parseInt(URL.substring(URL.length() - 19, URL.length() - 12));
-                    skuTemp = URL.substring(URL.length() - 19, URL.length() - 12);
-                }catch(Exception e) {
-                    skuTemp = URL.substring(URL.length()-8);
-                }
-
-                System.out.println("Price = "+price + " SKU = "+SKU + " ImageURL = "+imageURL+ " Title = "+productTitle);
-                //productTitle = "test test"; //very temporary line change back immediately after big fix
-                if (price.contains("$")) {
-
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", price, true)
-                            .addField("**SKU**", skuTemp, true).setThumbnail(imageURL)
-                            .setUrl(URL).setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                } else {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", "$" + price, true)
-                            .addField("**SKU**", skuTemp, true).setThumbnail(imageURL)
-                            .setUrl(URL).setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                }
-
-
-
+                System.out.println("Sending Target");
+                hook.addEmbed(new DiscordWebhook.EmbedObject()
+                        .setTitle(productTitle)
+                        .addField("**Price**", price, true)
+                        .addField("**SKU**", SKU, true)
+                        .setThumbnail(imageURL)
+                        .setUrl(URL)
+                        .setColor(webhookColor)
+                        .setFooter(footerMessage, logo));
             }
             else if(website.equals("Amazon")) {
-                if (price.contains("$")) {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", price, true).setThumbnail(imageURL).setUrl(URL)
-                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                } else {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", "$" + price, true).setThumbnail(imageURL).setUrl(URL)
-                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                }
-
-
+                System.out.println("Sending Amazon");
+                System.out.println(imageURL);
+                hook.addEmbed(new DiscordWebhook.EmbedObject()
+                        .setTitle(productTitle)
+                        .addField("**Price**", price, true)
+                        .setThumbnail(imageURL)
+                        .setUrl(URL)
+                        .setColor(webhookColor)
+                        .setFooter(footerMessage, logo));
 
             }
-            else if(website.equals("Walmart")) {
-                if (price.contains("$")) {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", price, true).addField("**SKU**", SKU, true).setThumbnail(imageURL).setUrl(URL)
-                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                } else {
-                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
-                            .addField("**Price**", "$" + price, true).addField("**SKU**", SKU, true).setThumbnail(imageURL).setUrl(URL)
-                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
-                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
-                }
-            }
+//            else if(website.equals("Walmart")) {
+//                if (price.contains("$")) {
+//                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
+//                            .addField("**Price**", price, true).addField("**SKU**", SKU, true).setThumbnail(imageURL).setUrl(URL)
+//                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
+//                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
+//                } else {
+//                    hook.addEmbed(new DiscordWebhook.EmbedObject().setTitle(productTitle)
+//                            .addField("**Price**", "$" + price, true).addField("**SKU**", SKU, true).setThumbnail(imageURL).setUrl(URL)
+//                            .setColor(new Color(237, 17, 96)).setFooter("Powered by Helium Restocks",
+//                                    "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png"));
+//                }
+//            }
 
             //try to send the webhook
             try {
@@ -222,11 +204,11 @@ public class WebHookSeleniumManager {
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 //e.printStackTrace();
-                sendProductAvailable(URL, price, website, isRestock, isPriceChange, "Product from: "+website, imageURL, SKU, logo);
+                sendProductAvailable(URL, price, website, "Product from: "+website, imageURL, SKU);
                 try{channel.sendMessage(
                         "Could Not Execute Webhook Properly. Please report error and developers will fix as soon as possible!")
                         .queue();}catch(Exception e2){}
             }
-        }
+
     }
 }

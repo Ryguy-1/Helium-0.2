@@ -1,5 +1,6 @@
 package package1;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -29,14 +30,14 @@ public class SeleniumBot {
 
 
     //Timings For How Long to Wait for Different Retailers -> If wrong can cause false positives or time an IP out. These work well as Stock. Adjust at Your Own Risk
-    public static int amazonIn = 30;
-    public static int amazonOut = 180;
+    public static int amazonIn = 30; //change back to 30 later
+    public static int amazonOut = 360; //change back to 180 later
 
     public static int bestBuyIn = 12;
-    public static int bestBuyOut = 20;
+    public static int bestBuyOut = 180;
 
     public static int targetIn = 12;
-    public static int targetOut = 20;
+    public static int targetOut = 180;
 
     public static int walmartIn = 40;
     public static int walmartOut = 120;
@@ -52,269 +53,186 @@ public class SeleniumBot {
         runBot();
     }
 
+    private void sendAmazon(){
+
+        //initialize variables for try/catch
+        String URL, price, website, productTitle, imageURL, SKU;
+        URL = "Not Found"; price = "Not Found"; website = "Not Found"; productTitle = "Not Found"; imageURL = ""; SKU = "Not Found";
+
+        //Always Correct
+        URL = monitoringURL;
+        website = "Amazon";
+        SKU = null;
+
+        //Viariable Values
+        try{price = driver.findElement(By.id("priceblock_ourprice")).getText();}catch(Exception e){}
+        try{productTitle = driver.findElement(By.id("productTitle")).getText();}catch(Exception e){}
+        try{imageURL = driver.findElement(By.xpath("//*[@id=\"landingImage\"]")).getAttribute("src");}catch(Exception e){}
+        System.out.println("Sent from Amazon method");
+        sendMyManagers(URL, price, website, productTitle, imageURL, SKU);
+    }
+
+    private void sendBestBuy(){
+
+        //initialize variables for try/catch
+        String URL, price, website, productTitle, imageURL, SKU;
+        URL = "Not Found"; price = "Not Found"; website = "Not Found"; productTitle = "Not Found"; imageURL = ""; SKU = "Not Found";
+
+        //Always Correct
+        URL = monitoringURL;
+        website = "Best Buy";
+
+        //Variable Values
+        try{SKU = monitoringURL.substring(monitoringURL.length()-7); }catch(Exception e){}  //SKU is in the URL
+        try{price = driver.findElement(By.xpath("//*[@class=\"priceView-hero-price priceView-customer-price\"]/span[1]")).getText();}catch(Exception e){} System.out.println(price);
+        try{productTitle = driver.findElements(By.className("sku-title")).get(0).getText();}catch(Exception e){}
+        try{imageURL = driver.findElements(By.className("primary-image")).get(0).getAttribute("src");}catch(Exception e){}
+
+        System.out.println("Sent from BestBuy method");
+        sendMyManagers(URL, price, website, productTitle, imageURL, SKU);
+
+    }
+
+    public void sendTarget(){
+        //initialize variables for try/catch
+        String URL, price, website, productTitle, imageURL, SKU;
+        URL = "Not Found"; price = "Not Found"; website = "Not Found"; productTitle = "Not Found"; imageURL = ""; SKU = "Not Found";
+
+        //Always Correct
+        URL = monitoringURL;
+        website = "Target";
+
+        //Variable Values
+
+        try {
+            Integer.parseInt(URL.substring(URL.length() - 19, URL.length() - 12));
+            SKU = URL.substring(URL.length() - 19, URL.length() - 12);
+        }catch(Exception e) {
+            SKU = URL.substring(URL.length()-8);
+        }
+        //just decided to use Xpaths for these ones
+        try{price = driver.findElement(By.xpath("//*[@id=\"viewport\"]/div[5]/div/div[2]/div[2]/div[1]/div[1]/div[1]")).getText();}catch(Exception e){} System.out.println(price);
+        try{productTitle = driver.findElement(By.xpath("//*[@id=\"viewport\"]/div[5]/div/div[1]/div[2]/h1/span")).getText();}catch(Exception e){}
+        try{imageURL = driver.findElement(By.xpath("//*[@id=\"viewport\"]/div[5]/div/div[2]/div[1]/div/div/div/div[1]/div/div[1]/button/img")).getAttribute("src");}catch(Exception e){}
+
+        System.out.println("Sent from Target method");
+        sendMyManagers(URL, price, website, productTitle, imageURL, SKU);
+    }
+
 
     public void runBot() {
-        driver.get(monitoringURL);
+        System.out.println("About to Get URL");
+        try {
+            driver.get(monitoringURL);
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Closed Because Could Not Get URL. Please Report Error to Developers.");
+            quitBot();
+            removeManager(myManagers.get(0)); //Change if there are multiple monitors in the future. Not for this version.
+        }
         System.out.println("Gotten URL");
         pause(4);
         if (monitoringURL.contains("amazon")) {
             t1 = new Thread(() -> {
-                WebElement price = driver.findElement(By.xpath("//*[@id=\"availability\"]/span"));
-                System.out.println(price.getText());
                 while(true) {
                     while (isActive) {
-                        while (!isAvailable) {
-                            // when the product is not available and need to check when the product becomes
-                            // available
-                            try {
-                                WebElement price2 = driver.findElement(By.xpath("//*[@id=\"availability\"]/span"));
-                                if (!price2.getText().contains("Currently unavailable.")) {
-                                    try {
-                                        sendMyManagers(monitoringURL,
-                                                driver.findElement(By.id("priceblock_ourprice")).getText(), "Amazon", true,
-                                                false, driver.findElement(By.id("productTitle")).getText(),
-                                                driver.findElement(By.xpath("//*[@id=\"landingImage\"]"))
-                                                        .getAttribute("data-old-hires"),
-                                                "N/A",
-                                                "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                        // makes current price for next session when monitoring price
-                                        currentPrice = Integer.parseInt(
-                                                driver.findElement(By.id("priceblock_ourprice")).getText().substring(1,
-                                                        driver.findElement(By.id("priceblock_ourprice")).getText().length()
-                                                                - 3));
-                                    } catch (Exception e) {
-                                        sendMyManagers(monitoringURL, "Unknown", "Amazon", true, false,
-                                                driver.findElement(By.id("productTitle")).getText(),
-                                                driver.findElement(By.xpath("//*[@id=\"landingImage\"]"))
-                                                        .getAttribute("data-old-hires"),
-                                                "N/A",
-                                                "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                    }
+                        while(!isAvailable){
+                            try{
+                                WebElement availability = driver.findElement(By.xpath("//*[@id=\"availability\"]/span"));
+                                if(!availability.getText().contains("Currently unavailable.")){
+                                    //if there is an availability element and it does not say currently unavailable
+                                    System.out.println("Sending 1");
+                                    sendAmazon();
                                     isAvailable = true;
                                 }
-                            } catch (Exception e) {
-                                try {
-                                    sendMyManagers(monitoringURL,
-                                            driver.findElement(By.id("priceblock_ourprice")).getText(), "Amazon", true,
-                                            false, driver.findElement(By.id("productTitle")).getText(),
-                                            driver.findElement(By.xpath("//*[@id=\"landingImage\"]"))
-                                                    .getAttribute("data-old-hires"),
-                                            "N/A",
-                                            "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                    // makes current price for next session when monitoring price
-                                    currentPrice = Integer.parseInt(
-                                            driver.findElement(By.id("priceblock_ourprice")).getText().substring(1,
-                                                    driver.findElement(By.id("priceblock_ourprice")).getText().length()
-                                                            - 3));
-                                } catch (Exception e2) {
-                                    sendMyManagers(monitoringURL, "Unknown", "Amazon", true, false,
-                                            driver.findElement(By.id("productTitle")).getText(),
-                                            driver.findElement(By.xpath("//*[@id=\"landingImage\"]"))
-                                                    .getAttribute("data-old-hires"),
-                                            "N/A",
-                                            "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                }
-                                isAvailable = true;
+                            }catch(Exception e){
+                                    //if there is no availability tag
+                                    System.out.println("Sending 2");
+                                    sendAmazon();
+                                    isAvailable = true;
                             }
+                            //does neither (try -> if) // (catch) blocks if there is availability tag and it says "Currently unavailable."
+                            pause(amazonIn);
                             driver.navigate().refresh();
-                            pause(amazonIn); //pause for in stock
+
                         }
-                        while (isAvailable) {
-                            // while product is available and need to check if the product becomes
-                            // unavailable
-                            try {
-                                WebElement price2 = driver.findElement(By.id("priceblock_ourprice"));
-//							// checks to see if the price has lowered or if it became unavailable.
-                                System.out.println("Price with substring = "
-                                        + Integer.parseInt(price2.getText().substring(1, price2.getText().length() - 3)));
-                                if (Integer.parseInt(
-                                        price2.getText().substring(1, price2.getText().length() - 3)) != currentPrice) {
-                                    System.out.println("Product is available for lower price!!!!!!");
-                                    sendMyManagers(monitoringURL, price2.getText(), "Amazon", false, true,
-                                            driver.findElement(By.id("productTitle")).getText(),
-                                            driver.findElement(By.xpath("//*[@id=\"landingImage\"]"))
-                                                    .getAttribute("data-old-hires"),
-                                            "N/A",
-                                            "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                    currentPrice = Integer
-                                            .parseInt(price2.getText().substring(1, price2.getText().length() - 3));
+                        while(isAvailable){
+                            try{
+                                WebElement availability = driver.findElement(By.xpath("//*[@id=\"availability\"]/span"));
+                                if(availability.getText().contains("Currently unavailable.")){
+                                    isAvailable = false;
                                 }
-                            } catch (Exception e) {
-                                isAvailable = false;
+                            }catch(Exception e){
                             }
+                            pause(amazonOut);
                             driver.navigate().refresh();
-                            pause(amazonOut);//pause for out of stock
+
                         }
                     }
                     pause (2);
                 }
             });
-
             t1.start();
+
 
         }
         else if (monitoringURL.contains("bestbuy")) {
-            t1 = new Thread(() -> {
 
-                while (true) {
+            //LEFT OFF HERE TRYING TO FIGURE OUT TIMEOUTS -> BEST BUY IS LOADING INSANELY SLOW
+
+            t1 = new Thread(() -> {
+                while(true) {
                     while (isActive) {
-                        while (!isAvailable) {
-                            System.out.println("Is not Available");
-                            // when the product is not available and need to check when the product becomes
-                            // available
+                        while(!isAvailable){
+                            //catch the no thanks
                             try {
                                 WebElement noThx = driver.findElement(By.id("survey_invite_no"));
                                 noThx.click();
                                 pause(1);
                             } catch (Exception e) {}
 
-                            List<WebElement> elements = driver.findElements(By.className("sr-only"));
-                            int idx = 0;
-                            int counter = 0;
-                            for (int i = 0; i < elements.size(); i++) {
-                                if (elements.get(i).getText().contains("Your price for this item")) {
-                                    idx = i;
-                                    counter++;
-                                    break;
-                                }
-                            }
-                            WebElement price = elements.get(idx);
-                            List<WebElement> buttonsAddToCart = driver
-                                    .findElements(By.xpath("//*[@class='product-data-value body-copy']"));
-                            String SKU = "";
 
-                            for (int i = 0; i < buttonsAddToCart.size(); i++) {
-                                if (buttonsAddToCart.get(i).getText().length() == 7) {
-                                    SKU = buttonsAddToCart.get(i).getText();
-                                }
-                            }
-                            try {
-                                WebElement buttonAddToCart = driver
-                                        .findElement(By.className("fulfillment-add-to-cart-button"));
-                                System.out.println("ran this");
-                                if (!buttonAddToCart.getText().contains("Sold Out")
-                                        && !buttonAddToCart.getText().contains("Find a Store") && !buttonAddToCart.getText().contains("Pre-Order") && !buttonAddToCart.getText().contains("Coming Soon")) {
-                                    try {
-                                        sendMyManagers(monitoringURL,
-                                                price.getText().substring(28,
-                                                        price.getText().length()),
-                                                "Best Buy", true, false,
-                                                driver.findElement(By.className("sku-title")).getText(),
-                                                driver.findElement(By.className("primary-image")).getAttribute("src"),
-                                                SKU,
-                                                "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                        // makes current price for next session when monitoring price
-                                        currentPrice = Integer.parseInt(price.getText()
-                                                .substring(price.getText().length() - 5, price.getText().length() - 3));
-                                        System.out.println("sent from 1");
-
-                                    } catch (Exception e) {
-                                        sendMyManagers(monitoringURL,
-                                                price.getText().substring(28,
-                                                        price.getText().length()),
-                                                "Best Buy", true, false,
-                                                driver.findElement(By.className("sku-title")).getText(),
-                                                driver.findElement(By.className("primary-image")).getAttribute("src"),
-                                                SKU,
-                                                "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                        System.out.println("sent from 2");
-                                    }
+                            try{
+                                WebElement availability = driver.findElements(By.className("fulfillment-add-to-cart-button")).get(0); //Only One Though
+                                if(availability.getText().contains("Add to Cart")){
+                                    //if there is an availability element and it does not say currently unavailable
+                                    System.out.println("Sending 1");
+                                    sendBestBuy();
                                     isAvailable = true;
                                 }
-                            } catch (Exception e) {
-                                try {
-                                    sendMyManagers(monitoringURL,
-                                            price.getText().substring(28,
-                                                    price.getText().length()),
-                                            "Best Buy", true, false,
-                                            driver.findElement(By.className("sku-title")).getText(),
-                                            driver.findElement(By.className("primary-image")).getAttribute("src"), SKU,
-                                            "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                    // makes current price for next session when monitoring price
-                                    currentPrice = Integer.parseInt(price.getText()
-                                            .substring(price.getText().length() - 5, price.getText().length() - 3));
-                                } catch (Exception e2) {
-                                    System.out.println(price.getText());
-                                    sendMyManagers(monitoringURL,
-                                            price.getText().substring(28),
-                                            "Best Buy", true, false,
-                                            driver.findElement(By.className("sku-title")).getText(),
-                                            driver.findElement(By.className("primary-image")).getAttribute("src"), SKU,
-                                            "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                }
-                                isAvailable = true;
+                            }catch(Exception e){
+                                //throws if there is no availability button
                             }
+                            //does neither (try -> if) // (catch) blocks if there is availability tag and it says "Currently unavailable."
                             driver.navigate().refresh();
                             pause(bestBuyIn);
+
                         }
-
-                        while (isAvailable) {
-                            // while product is available and need to check if the product becomes
-                            // unavailable
-                            try {
-                                WebElement noThx = driver.findElement(By.id("survey_invite_no"));
-                                noThx.click();
-                                pause(1);
-                                System.out.println("caught no thanks");
-                            } catch (Exception e) {}
-
-                            try {
-                                List<WebElement> elements = driver.findElements(By.className("sr-only"));
-                                int idx = 0;
-                                int counter = 0;
-                                for (int i = 0; i < elements.size(); i++) {
-                                    if (elements.get(i).getText().contains("Your price for this item")) {
-                                        idx = i;
-                                        counter++;
-                                        break;
-                                    }
-                                }
-                                WebElement price = elements.get(idx);
-                                List<WebElement> buttonsAddToCart = driver
-                                        .findElements(By.xpath("//*[@class='product-data-value body-copy']"));
-                                String SKU = "";
-
-                                for (int i = 0; i < buttonsAddToCart.size(); i++) {
-                                    if (buttonsAddToCart.get(i).getText().length() == 7) {
-                                        SKU = buttonsAddToCart.get(i).getText();
-                                    }
-                                }
-                                if (!driver.findElement(By.className("fulfillment-add-to-cart-button")).getText()
-                                        .contains("Add to Cart")) {
-                                    System.out.println("Sold out again");
+                        while(isAvailable){
+                            try{
+                                WebElement availability = driver.findElement(By.className("fulfillment-add-to-cart-button"));
+                                if(!availability.getText().contains("Add to Cart")){
                                     isAvailable = false;
-                                } else if (Integer.parseInt(price.getText().substring(price.getText().length() - 5,
-                                        price.getText().length() - 3)) != currentPrice) {
-                                    System.out.println("Product is available for lower price!!!!!!");
-                                    sendMyManagers(monitoringURL,
-                                            price.getText().substring(28,
-                                                    price.getText().length()),
-                                            "Best Buy", false, true,
-                                            driver.findElement(By.className("sku-title")).getText(),
-                                            driver.findElement(By.className("primary-image")).getAttribute("src"), SKU,
-                                            "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                    currentPrice = Integer.parseInt(price.getText()
-                                            .substring(price.getText().length() - 5, price.getText().length() - 3));
                                 }
-                            } catch (Exception e) {
-                                isAvailable = false;
+                            }catch(Exception e){
                             }
                             driver.navigate().refresh();
                             pause(bestBuyOut);
+
                         }
                     }
-                    pause(2);
+                    pause (2);
                 }
             });
             t1.start();
-
         }
         else if (monitoringURL.contains("target")) {
 
+            //LEFT OFF HERE TRYING TO FIGURE OUT TIMEOUTS -> BEST BUY IS LOADING INSANELY SLOW
+
             t1 = new Thread(() -> {
-                while (true) {
+                while(true) {
                     while (isActive) {
-                        while (!isAvailable) {
+                        while(!isAvailable){
                             boolean avail1;
                             try {
                                 driver.findElement(By.xpath("//*[text()='Ship it']")).click(); // "availability":"OutOfStock"
@@ -334,39 +252,19 @@ public class SeleniumBot {
                             } catch (Exception e) {
                                 avail1 = false;
                             }
-                            // substring gets rid of price sign
-                            String priceText = driver
-                                    .findElement(By.xpath(
-                                            "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[2]/div[1]/div[1]/div[1]"))
-                                    .getText()
-                                    .substring(1);
 
-                            // if at least one of the two buttons exists. Product is available.
-                            if (avail1) { // was: avail1 == true || avail2 == true
-                                sendMyManagers(monitoringURL, priceText, "Target", true, false,
-                                        driver.findElement(
-                                                By.xpath("//*[@id=\"viewport\"]/div[5]/div/div[1]/div[2]/h1"))
-                                                .getText(),
-                                        driver.findElement(By.xpath(
-                                                "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[1]/div/div/div/div[1]/div/div[1]/button/img"))
-                                                .getAttribute("src"),
-                                        "N/A",
-                                        "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
+                            if (avail1) {
+
                                 // makes current price for next session when monitoring price
-                                currentPrice = Integer.parseInt(driver
-                                        .findElement(By.xpath(
-                                                "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[2]/div[1]/div[1]/div[1]"))
-                                        .getText()
-                                        .substring(1, driver.findElement(By.xpath(
-                                                "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[2]/div[1]/div[1]/div[1]"))
-                                                .getText().length() - 3));
+                                sendTarget();
                                 System.out.println("sent from 1");
                                 isAvailable = true;
                             }
                             driver.navigate().refresh();
                             pause(targetIn);
+
                         }
-                        while (isAvailable) {
+                        while(isAvailable){
                             boolean avail1;
                             try {
                                 driver.findElement(By.xpath("//*[text()='Ship it']"));
@@ -379,84 +277,160 @@ public class SeleniumBot {
                             }
                             driver.navigate().refresh();
                             pause(targetOut);
+
                         }
                     }
-                    pause(2);
+                    pause (2);
                 }
             });
             t1.start();
 
+//
+//            t1 = new Thread(() -> {
+//                while (true) {
+//                    while (isActive) {
+//                        while (!isAvailable) {
+//                            boolean avail1;
+//                            try {
+//                                driver.findElement(By.xpath("//*[text()='Ship it']")).click(); // "availability":"OutOfStock"
+//                                // ->
+//                                // Broken feature on target werido
+//                                // this dismiss message pops up if it is not available even though the ship it
+//                                // button pops up.
+//                                pause(1);
+//                                try {
+//                                    driver.findElement(By.xpath("//*[text()='Dismiss']")); // Dismiss
+//                                    avail1 = false;
+//                                } catch (Exception e) {
+//                                    // if there is no dismiss button
+//                                    avail1 = true;
+//                                }
+//                                // if no error is thrown, avail1 is true.
+//                            } catch (Exception e) {
+//                                avail1 = false;
+//                            }
+//                            // substring gets rid of price sign
+//                            String priceText = driver
+//                                    .findElement(By.xpath(
+//                                            "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[2]/div[1]/div[1]/div[1]"))
+//                                    .getText()
+//                                    .substring(1);
+//
+//                            // if at least one of the two buttons exists. Product is available.
+//                            if (avail1) { // was: avail1 == true || avail2 == true
+//                                sendMyManagers(monitoringURL, priceText, "Target", true, false,
+//                                        driver.findElement(
+//                                                By.xpath("//*[@id=\"viewport\"]/div[5]/div/div[1]/div[2]/h1"))
+//                                                .getText(),
+//                                        driver.findElement(By.xpath(
+//                                                "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[1]/div/div/div/div[1]/div/div[1]/button/img"))
+//                                                .getAttribute("src"),
+//                                        "N/A",
+//                                        "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
+//                                // makes current price for next session when monitoring price
+//                                currentPrice = Integer.parseInt(driver
+//                                        .findElement(By.xpath(
+//                                                "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[2]/div[1]/div[1]/div[1]"))
+//                                        .getText()
+//                                        .substring(1, driver.findElement(By.xpath(
+//                                                "//*[@id=\"viewport\"]/div[5]/div/div[2]/div[2]/div[1]/div[1]/div[1]"))
+//                                                .getText().length() - 3));
+//                                System.out.println("sent from 1");
+//                                isAvailable = true;
+//                            }
+//                            driver.navigate().refresh();
+//                            pause(targetIn);
+//                        }
+//                        while (isAvailable) {
+//                            boolean avail1;
+//                            try {
+//                                driver.findElement(By.xpath("//*[text()='Ship it']"));
+//                                avail1 = true;
+//                            } catch (Exception e) {
+//                                avail1 = false;
+//                            }
+//                            if (avail1 == false) {
+//                                isAvailable = false;
+//                            }
+//                            driver.navigate().refresh();
+//                            pause(targetOut);
+//                        }
+//                    }
+//                    pause(2);
+//                }
+//            });
+//            t1.start();
+
         }
-        else if (monitoringURL.contains("walmart")) {
-
-            // can use xpaths only if window stays a size which doesn't affect the html
-            t1 = new Thread(() -> {
-                while (true) {
-                    while (isActive) {
-
-                        while (!isAvailable) {
-
-                            boolean avail1;
-
-                            try {
-                                driver.findElement(By.xpath("//*[text()='Get in-stock alert']")); // "availability":"OutOfStock"
-                                // ->
-                                // Broken feature on target werido
-                                // only false if the out of stock element cannot be found.
-                                avail1 = false;
-                            } catch (Exception e) {
-                                avail1 = true;
-                            }
-                            // substring gets rid of price sign
-                            String priceText;
-                            try {
-                                priceText = driver.findElement(By.xpath("//*[@id=\"price\"]/div/span[1]/span/span[2]/span[2]"))
-                                        .getAttribute("content");
-                                System.out.println("priceText is " + priceText);
-                            }catch(Exception e) {
-                                priceText = "No Listed Price";
-                            }
-                            // if at least one of the two buttons exists. Product is available.
-                            if (avail1) { // was: avail1 == true || avail2 == true
-                                // JOptionPane.showMessageDialog(null, "avail1 is true now.");
-                                sendMyManagers(monitoringURL, priceText, "Walmart", true, false,
-                                        driver.findElement(
-                                                By.xpath("//*[@id=\"product-overview\"]/div/div[3]/div/h1"))
-                                                .getText(),
-                                        driver.findElement(By.className("prod-alt-image-carousel-image--left"))
-                                                .getAttribute("src"),
-                                        driver.findElement(By.xpath("//*[contains(text(),'Walmart #')]")).getText().substring(driver.findElement(By.xpath("//*[contains(text(),'Walmart #')]")).getText().length()-8),
-                                        "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
-                                // makes current price for next session when monitoring price
-                                isAvailable = true;
-                            }
-                            driver.navigate().refresh();
-                            pause(walmartIn);
-                        }
-                        while (isAvailable) {
-                            try {
-                                driver.findElement(By.xpath("//*[text()='Get in-stock alert']"));
-                                isAvailable = false;
-                            } catch (Exception e) {
-                                isAvailable = true;
-                            }
-                            driver.navigate().refresh();
-                            pause(walmartOut);
-                        }
-                    }
-                    pause(2);
-                }
-            });
-            t1.start();
-        }
+//        else if (monitoringURL.contains("walmart")) {
+//
+//            // can use xpaths only if window stays a size which doesn't affect the html
+//            t1 = new Thread(() -> {
+//                while (true) {
+//                    while (isActive) {
+//
+//                        while (!isAvailable) {
+//
+//                            boolean avail1;
+//
+//                            try {
+//                                driver.findElement(By.xpath("//*[text()='Get in-stock alert']")); // "availability":"OutOfStock"
+//                                // ->
+//                                // Broken feature on target werido
+//                                // only false if the out of stock element cannot be found.
+//                                avail1 = false;
+//                            } catch (Exception e) {
+//                                avail1 = true;
+//                            }
+//                            // substring gets rid of price sign
+//                            String priceText;
+//                            try {
+//                                priceText = driver.findElement(By.xpath("//*[@id=\"price\"]/div/span[1]/span/span[2]/span[2]"))
+//                                        .getAttribute("content");
+//                                System.out.println("priceText is " + priceText);
+//                            }catch(Exception e) {
+//                                priceText = "No Listed Price";
+//                            }
+//                            // if at least one of the two buttons exists. Product is available.
+//                            if (avail1) { // was: avail1 == true || avail2 == true
+//                                // JOptionPane.showMessageDialog(null, "avail1 is true now.");
+//                                sendMyManagers(monitoringURL, priceText, "Walmart", true, false,
+//                                        driver.findElement(
+//                                                By.xpath("//*[@id=\"product-overview\"]/div/div[3]/div/h1"))
+//                                                .getText(),
+//                                        driver.findElement(By.className("prod-alt-image-carousel-image--left"))
+//                                                .getAttribute("src"),
+//                                        driver.findElement(By.xpath("//*[contains(text(),'Walmart #')]")).getText().substring(driver.findElement(By.xpath("//*[contains(text(),'Walmart #')]")).getText().length()-8),
+//                                        "https://cdn.dribbble.com/users/1597648/screenshots/3379974/z_dribbble.jpg");
+//                                // makes current price for next session when monitoring price
+//                                isAvailable = true;
+//                            }
+//                            driver.navigate().refresh();
+//                            pause(walmartIn);
+//                        }
+//                        while (isAvailable) {
+//                            try {
+//                                driver.findElement(By.xpath("//*[text()='Get in-stock alert']"));
+//                                isAvailable = false;
+//                            } catch (Exception e) {
+//                                isAvailable = true;
+//                            }
+//                            driver.navigate().refresh();
+//                            pause(walmartOut);
+//                        }
+//                    }
+//                    pause(2);
+//                }
+//            });
+//            t1.start();
+//        }
     }
 
-    private void sendMyManagers(String URL, String price, String website, boolean isRestock, boolean isPriceChange,
-                                String productTitle, String imageURL, String SKU, String logo) {
+    private void sendMyManagers(String URL, String price, String website, String productTitle, String imageURL, String SKU) {
 
         for (int i = 0; i < myManagers.size(); i++) {
-            myManagers.get(i).sendProductAvailable(URL, price, website, isRestock, isPriceChange, productTitle,
-                    imageURL, SKU, logo);
+            myManagers.get(i).sendProductAvailable(URL, price, website, productTitle, imageURL, SKU);
+            System.out.println("Sent");
         }
 
     }
@@ -489,14 +463,27 @@ public class SeleniumBot {
     public void initializeBot() {
 		//test invisible
 		if(!isVisible) {
-            ChromeOptions options = new ChromeOptions();
-            options.addArguments("--headless", "--silent");
-            //end test
-
-            driver = new ChromeDriver(options);// would put "options" as the parameter for testing
-            resizeWindow(driver, 1500, 800);
+		    //temporarily cannot use headless with BestBuy
+            if(!monitoringURL.contains("bestbuy")) {
+                ChromeOptions options = new ChromeOptions();
+                options.addArguments("--headless", "--silent", "--disable-gpu", "--window-size=1500,800", "--lang=en_US"); //"--headless", "--silent"
+                //end test
+                driver = new ChromeDriver(options);// would put "options" as the parameter for testing
+                //resizeWindow(driver, 1500, 800);
+            }else{
+                ChromeOptions options = new ChromeOptions();
+//		    String proxy = "192.46.228.131:8000";
+//            options.addArguments("--proxy-server=http://" + proxy);
+                driver = new ChromeDriver(options);// would put "options" as the parameter for testing
+                //driver.manage().timeouts().pageLoadTimeout(Duration.ofMinutes(3));
+                resizeWindow(driver, 1500, 800);
+            }
         }else{
-            driver = new ChromeDriver();// would put "options" as the parameter for testing
+		    ChromeOptions options = new ChromeOptions();
+//		    String proxy = "192.46.228.131:8000";
+//            options.addArguments("--proxy-server=http://" + proxy);
+            driver = new ChromeDriver(options);// would put "options" as the parameter for testing
+            //driver.manage().timeouts().pageLoadTimeout(Duration.ofMinutes(3));
             resizeWindow(driver, 1500, 800);
         }
 
