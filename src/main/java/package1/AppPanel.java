@@ -41,6 +41,9 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
     private ArrayList<ActiveMonitor> drawnMonitors;
 
     //DISCORD_STATE
+    private CustomButton addDiscord;
+    private boolean addingDiscord;
+    private boolean addedDiscord;
 
     public static int currentState;
 
@@ -70,6 +73,10 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         removingMonitors = false;
         removingWebhook = false;
         drawnMonitors = new ArrayList<ActiveMonitor>();
+        //DISCORD_STATE
+        addDiscord = new CustomButton(Runner.WIDTH*1/4, Runner.HEIGHT*1/4, Runner.WIDTH/2, Runner.HEIGHT/6, "Add Discord Bot", Color.white, 55, 84);
+        addingDiscord = false;
+        addedDiscord = false;
 
 
     }
@@ -225,6 +232,8 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
             active.draw(g);
         }
 
+        //updateActiveMonitors(); //For when a monitor is added through discord
+
 
         g2d.dispose();
 
@@ -262,8 +271,8 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
 
 
-        g.setColor(Color.pink);
-        g.fillRect(0,0,Runner.WIDTH/12, Runner.HEIGHT);
+//        g.setColor(Color.pink);
+//        g.fillRect(0,0,Runner.WIDTH/12, Runner.HEIGHT);
 
         //draw Task bar
         g2d.setColor(Color.darkGray);
@@ -282,10 +291,22 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         discordButton.draw(g);
 
 
-
-
-
-
+        if(!addedDiscord) {
+            if(addingDiscord){
+                g.setFont(titleFont);
+                addDiscord.fill(g);
+                addDiscord.draw(g);
+            }else if(!addingDiscord){
+                g.setFont(titleFont);
+                addDiscord.draw(g);
+            }
+        }else if(addedDiscord){
+            addingDiscord = false;
+            g.setFont(titleFont);
+            g.setColor(Color.white);
+            g.drawString("Discord Added", Runner.WIDTH*1/4+55, Runner.HEIGHT*1/4+84);
+            //addDiscord = new CustomButton(Runner.WIDTH*1/4, Runner.HEIGHT*1/4, Runner.WIDTH/2, Runner.HEIGHT/6, "Add Discord Bot", Color.white, 55, 84);
+        }
 
 
         g2d.dispose();
@@ -294,7 +315,31 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
     }
 
 
-    private void updateActiveMonitors(){
+    private void addJDA(){
+
+        String key = "";
+
+        try {
+            key = (String) JOptionPane.showInputDialog(null, "Bot Key (Keep Secret)",
+                    "Please Enter the Bot's Key Obtained from Discord Developer Portal", JOptionPane.QUESTION_MESSAGE);
+
+        }catch(Exception e){}
+
+        if(!addedDiscord){
+            try {
+                Runner.manager.addDiscord(key);
+                addedDiscord = true;
+            }catch(Exception e){
+                JOptionPane.showMessageDialog(null, "Could Not Add Discord Please Make Sure the Key is Correct");
+            }
+        }
+
+        addingDiscord = false;
+
+    }
+
+
+    public void updateActiveMonitors(){
 
         //drawnMonitors;
 
@@ -460,27 +505,27 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         }
 
         //separate because also have to draw taskbar in top else if statement
-        if(currentState == MONITORING_STATE){
-            if(viewMonitors.contains(e.getX(), e.getY())){
+        if(currentState == MONITORING_STATE) {
+            if (viewMonitors.contains(e.getX(), e.getY())) {
                 //viewing monitors
                 viewingMonitors = true;
                 addingMonitors = false;
                 removingMonitors = false;
                 removingWebhook = false;
-            }else if(addMonitor.contains(e.getX(), e.getY())){
+            } else if (addMonitor.contains(e.getX(), e.getY())) {
                 //add monitor
                 viewingMonitors = false;
                 addingMonitors = true;
                 removingMonitors = false;
                 removingWebhook = false;
                 addMonitor();
-            }else if(removeMonitor.contains(e.getX(), e.getY())){
+            } else if (removeMonitor.contains(e.getX(), e.getY())) {
                 viewingMonitors = false;
                 addingMonitors = false;
                 removingMonitors = true;
                 removingWebhook = false;
                 removeMonitor();
-            }else if(removeWebhook.contains(e.getX(), e.getY())){
+            } else if (removeWebhook.contains(e.getX(), e.getY())) {
                 viewingMonitors = false;
                 addingMonitors = false;
                 removingMonitors = false;
@@ -488,22 +533,28 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
                 removeWebhook();
             }
 
-            for (ActiveMonitor monitor: drawnMonitors){
-                if(monitor.getWebhookButton().contains(e.getX(), e.getY())){
+            for (ActiveMonitor monitor : drawnMonitors) {
+                if (monitor.getWebhookButton().contains(e.getX(), e.getY())) {
                     JOptionPane.showMessageDialog(null, monitor.getWebhookURL());
-                }else if(monitor.getTargetButton().contains(e.getX(), e.getY())){
+                } else if (monitor.getTargetButton().contains(e.getX(), e.getY())) {
                     JOptionPane.showMessageDialog(null, monitor.getTargetURLs());
-                }else if(monitor.getBestBuyButton().contains(e.getX(), e.getY())){
+                } else if (monitor.getBestBuyButton().contains(e.getX(), e.getY())) {
                     JOptionPane.showMessageDialog(null, monitor.getBestBuyURLs());
                 }//else if(monitor.getWalmartButton().contains(e.getX(), e.getY())){
-                    //JOptionPane.showMessageDialog(null, monitor.getWalmartURLs());
+                //JOptionPane.showMessageDialog(null, monitor.getWalmartURLs());
                 //}
-                else if(monitor.getAmazonButton().contains(e.getX(), e.getY())){
+                else if (monitor.getAmazonButton().contains(e.getX(), e.getY())) {
                     JOptionPane.showMessageDialog(null, monitor.getAmazonURLs());
                 }
             }
+        }
 
-
+        if(currentState == DISCORD_STATE){
+            if(addDiscord.contains(e.getX(), e.getY())){
+                addingDiscord = true;
+                addJDA();
+                System.out.println("Clicked Add Button Discord");
+            }
         }
 
 
@@ -572,48 +623,49 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
        }
 
 
-       if(currentState==MONITORING_STATE){
+       if(currentState==MONITORING_STATE) {
 
-           if(viewMonitors.contains(e.getX(), e.getY())){
+           if (viewMonitors.contains(e.getX(), e.getY())) {
                viewMonitors.setTextColor(Color.GRAY);
-           }else{
+           } else {
                viewMonitors.setTextColor(Color.WHITE);
            }
 
-           if(addMonitor.contains(e.getX(), e.getY())){
+           if (addMonitor.contains(e.getX(), e.getY())) {
                addMonitor.setTextColor(Color.GRAY);
-           }else{
+           } else {
                addMonitor.setTextColor(Color.WHITE);
            }
 
-           if(removeMonitor.contains(e.getX(), e.getY())){
+           if (removeMonitor.contains(e.getX(), e.getY())) {
                removeMonitor.setTextColor(Color.GRAY);
-           }else{
+           } else {
                removeMonitor.setTextColor(Color.WHITE);
            }
 
-           if(removeWebhook.contains(e.getX(), e.getY())){
+           if (removeWebhook.contains(e.getX(), e.getY())) {
                removeWebhook.setTextColor(Color.GRAY);
-           }else{
+           } else {
                removeWebhook.setTextColor(Color.WHITE);
            }
 
-           for(ActiveMonitor monitor: drawnMonitors){
-               if(monitor.getWebhookButton().contains(e.getX(), e.getY())){
+
+           for (ActiveMonitor monitor : drawnMonitors) {
+               if (monitor.getWebhookButton().contains(e.getX(), e.getY())) {
                    monitor.getWebhookButton().setTextColor(Color.GRAY);
-               }else{
+               } else {
                    monitor.getWebhookButton().setTextColor(Color.WHITE);
                }
-                //website buttons
-               if(monitor.getTargetButton().contains(e.getX(), e.getY())){
+               //website buttons
+               if (monitor.getTargetButton().contains(e.getX(), e.getY())) {
                    monitor.getTargetButton().setTextColor(Color.GRAY);
-               }else{
+               } else {
                    monitor.getTargetButton().setTextColor(Color.WHITE);
                }
 
-               if(monitor.getBestBuyButton().contains(e.getX(), e.getY())){
+               if (monitor.getBestBuyButton().contains(e.getX(), e.getY())) {
                    monitor.getBestBuyButton().setTextColor(Color.GRAY);
-               }else{
+               } else {
                    monitor.getBestBuyButton().setTextColor(Color.WHITE);
                }
 
@@ -623,17 +675,27 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 //                   monitor.getWalmartButton().setTextColor(Color.WHITE);
 //               }
 
-               if(monitor.getAmazonButton().contains(e.getX(), e.getY())){
+               if (monitor.getAmazonButton().contains(e.getX(), e.getY())) {
                    monitor.getAmazonButton().setTextColor(Color.GRAY);
-               }else{
+               } else {
                    monitor.getAmazonButton().setTextColor(Color.WHITE);
                }
 
 
            }
-
-
        }
+
+       if(currentState == DISCORD_STATE){
+           if(addDiscord.contains(e.getX(), e.getY())){
+               addDiscord.setTextColor(Color.GRAY);
+           }else{
+               addDiscord.setTextColor(Color.WHITE);
+           }
+       }
+
+
+
+
 
 
     }

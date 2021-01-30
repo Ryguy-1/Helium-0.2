@@ -16,7 +16,7 @@ public class WebHookSeleniumManager {
 
     private final Color webhookColor= new Color(237, 17, 96);
     private final String footerMessage = "Powered By Helium Restocks";
-    private final String logo = "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png";
+    public static final String logo = "https://www.pngitem.com/pimgs/m/403-4031699_letter-h-png-stock-photo-letter-h-png.png";
 
     private String webhookURL;
     private MessageChannel channel;

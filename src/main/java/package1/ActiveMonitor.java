@@ -35,7 +35,6 @@ public class ActiveMonitor {
         this.textColor = textColor;
         this.webhookURL = webhookURL;
         getWebhook = new CustomButton(x+10, y+10, width-20, height/6, "Get Webhook URL", Color.white, 45, 60);
-        //
         target = new CustomButton(x+10, y+height-height*4/8-48, width-20, height/8, "Target: ", Color.white, 30, 48);
         bestBuy = new CustomButton(x+10, y+height-height*3/8-36, width-20, height/8, "BestBuy: ", Color.white, 30, 48);
         amazon = new CustomButton(x+10, y+height-height*2/8-24, width-20, height/8, "Amazon: ", Color.white, 30, 48);
@@ -98,9 +97,9 @@ public class ActiveMonitor {
         g.fillRect(x+5, y+5, width-10, height-10);
 
         g.setFont(buttonFont);
+
         getWebhook.draw(g);
         g.setFont(smallerFont);
-
         target.draw(g);
         numTarget=0;
         bestBuy.draw(g);
