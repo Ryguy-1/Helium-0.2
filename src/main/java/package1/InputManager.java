@@ -152,11 +152,13 @@ public class InputManager extends ListenerAdapter {
 
     }
 
-    public void removeDiscord(){
+    public boolean removeDiscord(){
         try{
             jda.shutdownNow();
+            return true;
         }catch(Exception e){
             JOptionPane.showMessageDialog(null, "Could not Shut Down Discord. Please Close Helium and Restart to Force Close.");
+            return false;
         }
     }
 

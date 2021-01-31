@@ -42,6 +42,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
 
     //DISCORD_STATE
     private CustomButton addDiscord;
+    private CustomButton removeDiscord;
     private boolean addingDiscord;
     private boolean addedDiscord;
 
@@ -75,6 +76,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         drawnMonitors = new ArrayList<ActiveMonitor>();
         //DISCORD_STATE
         addDiscord = new CustomButton(Runner.WIDTH*1/4, Runner.HEIGHT*1/4, Runner.WIDTH/2, Runner.HEIGHT/6, "Add Discord Bot", Color.white, 55, 84);
+        removeDiscord = new CustomButton(Runner.WIDTH*3/4, Runner.HEIGHT*5/6, Runner.WIDTH/4, Runner.HEIGHT/6, "Remove Discord --", Color.white, 80, 50);
         addingDiscord = false;
         addedDiscord = false;
 
@@ -302,6 +304,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
             }
         }else if(addedDiscord){
             addingDiscord = false;
+            removeDiscord.draw(g);
             g.setFont(titleFont);
             g.setColor(Color.white);
             g.drawString("Discord Added", Runner.WIDTH*1/4+55, Runner.HEIGHT*1/4+84);
@@ -550,11 +553,16 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         }
 
         if(currentState == DISCORD_STATE){
-            if(addDiscord.contains(e.getX(), e.getY())){
+            if(addDiscord.contains(e.getX(), e.getY()) && !addedDiscord){
                 addingDiscord = true;
                 addJDA();
                 System.out.println("Clicked Add Button Discord");
+            }else if(removeDiscord.contains(e.getX(), e.getY())){
+                if(Runner.manager.removeDiscord() == true){
+                    addedDiscord = false;
+                }
             }
+
         }
 
 
@@ -691,6 +699,13 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
            }else{
                addDiscord.setTextColor(Color.WHITE);
            }
+
+           if(removeDiscord.contains(e.getX(), e.getY())){
+               removeDiscord.setTextColor(Color.GRAY);
+           }else{
+               removeDiscord.setTextColor(Color.WHITE);
+           }
+
        }
 
 
