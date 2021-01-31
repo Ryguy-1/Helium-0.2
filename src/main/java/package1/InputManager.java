@@ -152,6 +152,14 @@ public class InputManager extends ListenerAdapter {
 
     }
 
+    public void removeDiscord(){
+        try{
+            jda.shutdownNow();
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null, "Could not Shut Down Discord. Please Close Helium and Restart to Force Close.");
+        }
+    }
+
     public void onMessageReceived(MessageReceivedEvent event) {
         String msg = event.getMessage().getContentRaw();
         channel = event.getChannel();
@@ -164,11 +172,182 @@ public class InputManager extends ListenerAdapter {
             try{webhookURL = msg.substring(prefix.length()-1+12);}catch(Exception e){}
             addWebhook(webhookURL, event);
 
+        }else if(msg.contains(prefix+"removeWebhook")){
+            String webhookURL = "";
+            try{webhookURL = msg.substring(prefix.length()-1+15);}catch(Exception e){}
+            removeWebhook(webhookURL, event);
+        }else if(msg.contains(prefix+"addURLToWebhook")){
+            String webhookURL = "";
+            String websiteURL = "";
+            boolean isVisible = false;
+            String[] URLs = {};
+            try{ URLs = msg.substring(prefix.length()-1+17).split(", ");}catch(Exception e){}
+            webhookURL = URLs[0];
+            websiteURL = URLs[1];
+            try{isVisible = Boolean.parseBoolean(URLs[2]);}catch(Exception e){event.getChannel().sendMessage("(Auto Setting Visibility to <false>)").queue();}
+            System.out.println("Webhook: "+webhookURL);
+            System.out.println("Website: "+websiteURL);
+            System.out.println("IsVisible: "+isVisible);
+            addURLtoWebhook(webhookURL, websiteURL, isVisible, event);
+        }else if(msg.contains(prefix+"removeURLFromWebhook")){
+            String webhookURL = "";
+            String websiteURL = "";
+            String[] URLs = {};
+            try{ URLs = msg.substring(prefix.length()-1+22).split(", ");}catch(Exception e){}
+            webhookURL = URLs[0];
+            websiteURL = URLs[1];
+            removeURLfromWebhook(webhookURL, websiteURL, event);
         }
 
 
 
+    }
 
+
+    private void help(){
+
+        EmbedBuilder eb = new EmbedBuilder();
+        MessageEmbed eb3 = new MessageEmbed("", "", "", null, null, 0, null, null, null, null, null, null, null);
+        eb.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+        eb.setTitle("Helium Commands :desktop:");
+        eb.addField("Help :question:", "`"+prefix + "help`", true);
+        eb.addField("Add Webhook :spider_web:", "`"+prefix + "addWebhook <WebhookURL>`", true);
+        eb.addField("Remove Webhook :spider_web:", "`"+prefix + "removeWebhook <WebhookURL>`", true);
+        eb.addField("Add URL to Webhook :page_with_curl:", "`"+prefix + "addURLToWebhook <WebhookURL>, <WebsiteURL>, <IsVisible(true/false)>`", true);
+        eb.addField("Remove URL from Webhook :page_with_curl:", "`"+prefix + "removeURLFromWebhook <WebhookURL>, <WebsiteURL>`", true);
+        eb.setFooter("Powered By Helium Restocks");
+        eb.setThumbnail("https://media1.giphy.com/media/3o7bubkR8SgWlMZewg/giphy.gif"); //gif
+        eb3 = eb.build();
+        channel.sendMessage(eb3).queue();
+
+    }
+
+
+    //methods, but for discord
+    private void addWebhook(String URL, MessageReceivedEvent event){
+        try {
+            if(webhookManagerList.size()<=3 && !webhookURLList.contains(URL)) {
+                webhookManagerList.add(new WebHookSeleniumManager(URL, null));
+                webhookURLList.add(URL);
+                //confirmation message
+                EmbedBuilder eb = new EmbedBuilder();
+                MessageEmbed eb3 = new MessageEmbed("", "", "", null, null, 0, null, null, null, null, null, null, null);
+                eb.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+                eb.setTitle("Successfully added Webhook! :spider_web: :white_check_mark:");
+                eb.setThumbnail("https://jonmgomes.com/wp-content/uploads/2020/02/Checkbox-Icon.gif"); //checkbox gif
+                eb.setFooter("Powered By Helium Restocks");
+                eb3 = eb.build();
+                channel.sendMessage(eb3).queue();
+                //
+            }else{
+                if(webhookManagerList.size()>=3){
+                    channel.sendMessage("Cannot Have More than 3 Webhooks in this Version!").queue();
+                }else{
+                    channel.sendMessage("Webhook Already Added!").queue();
+                }
+            }
+        } catch (Exception e) {
+            channel.sendMessage("Webhook Not Created Because Not a Valid Webhook URL!").queue();
+        }
+        Runner.panel.updateActiveMonitors();
+    }
+
+
+    public void removeWebhook(String webhookURL, MessageReceivedEvent event){
+        boolean wasRemoved = false;
+        for (int i = 0; i < webhookURLList.size(); i++) {
+            if(webhookURLList.get(i).equals(webhookURL)) {
+                webhookManagerList.get(i).removeOutputs();
+                webhookManagerList.remove(i);
+                webhookURLList.remove(i);
+                //confirmation message
+                EmbedBuilder eb = new EmbedBuilder();
+                MessageEmbed eb3 = new MessageEmbed("", "", "", null, null, 0, null, null, null, null, null, null, null);
+                eb.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+                eb.setTitle("Successfully Removed Webhook! :spider_web: :white_check_mark:");
+                eb.setThumbnail("https://jonmgomes.com/wp-content/uploads/2020/02/Checkbox-Icon.gif"); //checkbox gif
+                eb.setFooter("Powered By Helium Restocks");
+                eb3 = eb.build();
+                channel.sendMessage(eb3).queue();
+                //
+                wasRemoved = true;
+            }
+        }
+        Runner.panel.updateActiveMonitors();
+        if(!wasRemoved){
+            event.getChannel().sendMessage("Webhook Not Removed Because Never Added!").queue();
+        }
+    }
+
+    public void addURLtoWebhook(String webhookToAddToURL, String websiteURL, boolean isVisible, MessageReceivedEvent event){
+        boolean added = false;
+        boolean notValidURL = false;
+        if(websiteURL.contains("amazon") || websiteURL.contains("bestbuy") || websiteURL.contains("target")) { //had "walmart" as fourth option, but removed for now...
+            for (int j = 0; j < webhookURLList.size(); j++) {
+                if (webhookURLList.get(j).equals(webhookToAddToURL)) {
+                    webhookManagerList.get(j).addMonitor(websiteURL, isVisible);
+                    //confirmation message
+                    EmbedBuilder eb = new EmbedBuilder();
+                    MessageEmbed eb3 = new MessageEmbed("", "", "", null, null, 0, null, null, null, null, null, null, null);
+                    eb.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+                    eb.setTitle("Successfully added URL to Webhook! :page_with_curl: :white_check_mark:");
+                    eb.setThumbnail("https://jonmgomes.com/wp-content/uploads/2020/02/Checkbox-Icon.gif"); //checkbox gif
+                    eb.setFooter("Powered By Helium Restocks");
+                    eb3 = eb.build();
+                    channel.sendMessage(eb3).queue();
+                    //
+                    added = true;
+                }
+            }
+        }else{
+            System.out.println("Not a valid Website URL");
+            event.getChannel().sendMessage("Not a valid Website URL").queue();
+            notValidURL = true;
+        }
+
+        if(!added && !notValidURL){ //notValidURL is to make sure doesn't print both not valiud website url and that webhook has not been initialized yet.
+            System.out.println("Was not added because Webhook has Not been Initialized Yet");
+            event.getChannel().sendMessage("Was not added because Webhook has Not been Initialized Yet").queue();
+        }
+
+        Runner.panel.updateActiveMonitors();
+    }
+
+    public void removeURLfromWebhook(String webhookToRemoveFromURL, String websiteURL, MessageReceivedEvent event){
+        boolean removed = false;
+        if(websiteURL.contains("amazon") || websiteURL.contains("bestbuy") || websiteURL.contains("target")) { //had "walmart" as fourth
+            for (int j = 0; j < webhookURLList.size(); j++) {
+                if (webhookURLList.get(j).equals(webhookToRemoveFromURL)) {
+                    webhookManagerList.get(j).removeMonitor(websiteURL);
+                    removed = true;
+                }
+            }
+        }else{
+            event.getChannel().sendMessage("Not a valid Website URL").queue();
+        }
+        if(!removed){
+            event.getChannel().sendMessage("Was not removed because Webhook has Not been Initialized Yet").queue();
+        }
+        //confirmation message
+        EmbedBuilder eb = new EmbedBuilder();
+        MessageEmbed eb3 = new MessageEmbed("", "", "", null, null, 0, null, null, null, null, null, null, null);
+        eb.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
+        eb.setTitle("Successfully Removed URL from Webhook! :page_with_curl: :white_check_mark:");
+        eb.setThumbnail("https://jonmgomes.com/wp-content/uploads/2020/02/Checkbox-Icon.gif"); //checkbox gif
+        eb.setFooter("Powered By Helium Restocks");
+        eb3 = eb.build();
+        channel.sendMessage(eb3).queue();
+        //
+        Runner.panel.updateActiveMonitors();
+    }
+
+
+
+}
+
+
+
+//WAS IN ONMESSAGERECEIVED OVERRIDE
 //        //Can only add each URL once (Helps avoid redundance)
 //        boolean containsURL = false;
 //        for (int i = 0; i < webhookURLList.size(); i++) {
@@ -277,39 +456,3 @@ public class InputManager extends ListenerAdapter {
 //                    .queue();
 //
 //        }
-    }
-
-
-    private void help(){
-
-        EmbedBuilder eb = new EmbedBuilder();
-        MessageEmbed eb3 = new MessageEmbed("", "", "", null, null, 0, null, null, null, null, null, null, null);
-        eb.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256)));
-        eb.setTitle("Helium Commands :desktop:");
-        eb.addField("Help :question:", "`"+prefix + "help`", true);
-        eb.addField("Add Webhook :spider_web:", "`"+prefix + "addWebhook <WebhookURL>`", true);
-        eb.setFooter("Powered By Helium Restocks", WebHookSeleniumManager.logo);
-        eb.setThumbnail("https://cdn0.iconfinder.com/data/icons/user-interface-167/32/ui-02-512.png");
-        eb3 = eb.build();
-        channel.sendMessage(eb3).queue();
-
-    }
-
-
-    private void addWebhook(String URL, MessageReceivedEvent event){
-        try {
-            if(webhookManagerList.size()<=3) {
-                webhookManagerList.add(new WebHookSeleniumManager(URL, null));
-                webhookURLList.add(URL);
-            }else{
-                channel.sendMessage("Cannot Have More than 3 Webhooks in this Version!").queue();
-            }
-        } catch (Exception e) {
-            channel.sendMessage("Webhook Not Created Because Not a Valid Webhook URL").queue();
-        }
-        Runner.panel.updateActiveMonitors();
-    }
-
-
-
-}
