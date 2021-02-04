@@ -6,6 +6,13 @@ repositories {
     jcenter()
 }
 
+version = '0.0'
+
+configurations {
+    // configuration that holds jars to include in the jar
+    extraLibs
+}
+
 dependencies {
     // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0-alpha-7'
@@ -13,3 +20,17 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
 }
+
+jar {
+    manifest {
+        attributes(
+                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
+                'Main-Class': 'package1.Runner'
+        )
+    }
+    from {
+            configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+
+}
+
