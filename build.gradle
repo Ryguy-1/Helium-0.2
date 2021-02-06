@@ -1,36 +1,42 @@
 plugins {
-    id 'java'
+    id "groovy"
+    id "java"
+    id "idea"
 }
+
+version = '0.0'
 
 repositories {
     jcenter()
 }
 
-version = '0.0'
-
-configurations {
-    // configuration that holds jars to include in the jar
-    extraLibs
-}
-
 dependencies {
-    // https://mvnrepository.com/artifact/org.seleniumhq.selenium/selenium-java
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.0.0-alpha-7'
     implementation 'net.dv8tion:JDA:4.2.0_227'
+    implementation 'commons-io:commons-io:2.6' //adding temporarily
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.6.0'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+
 }
 
-jar {
-    manifest {
-        attributes(
-                'Class-Path': configurations.compile.collect { it.getName() }.join(' '),
-                'Main-Class': 'package1.Runner'
-        )
+task uberJar(type: Jar) {
+    archiveClassifier = 'uber'
+
+    from sourceSets.main.output
+
+    dependsOn configurations.runtimeClasspath
+
+
+    manifest{
+        attributes 'Main-Class' : 'package1.Runner',
+        'Implementation-Title' : 'Helium Restocks',
+        'Implementation-Version' : '0.0'
     }
+
     from {
-            configurations.extraLibs.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath.findAll { it.name.endsWith('jar') }.collect { zipTree(it) }
     }
 
 }
+
 
