@@ -17,6 +17,8 @@ public class Runner{
     public static final int WIDTH = 1200;
     public static final int HEIGHT = 700;
 
+    public static final String versionNum = "0.1";
+
     public static String guildId;
     public static InputManager manager;
 

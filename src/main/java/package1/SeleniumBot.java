@@ -30,17 +30,19 @@ public class SeleniumBot {
 
 
     //Timings For How Long to Wait for Different Retailers -> If wrong can cause false positives or time an IP out. These work well as Stock. Adjust at Your Own Risk
-    public static int amazonIn = 30; //change back to 30 later
-    public static int amazonOut = 360; //change back to 180 later
+    public static final int amazonIn = 30; //30
+    public static final int amazonOut = 360; //360
 
-    public static int bestBuyIn = 12;
-    public static int bestBuyOut = 180;
+    public static final int bestBuyIn = 15; //15
+    public static final int bestBuyOut = 30; //30
 
-    public static int targetIn = 12;
-    public static int targetOut = 180;
+    public static final int targetIn = 15; //15
+    public static final int targetOut = 30; //30
 
-    public static int walmartIn = 40;
-    public static int walmartOut = 120;
+    public static final int walmartIn = 60; //60
+    public static final int walmartOut = 360; //360
+
+    public static final int timeAfterRefresh = 2; //after refresh finishes, time wait for other elements to load
 
 
     SeleniumBot(String monitoringURL, boolean isVisible) {
@@ -84,7 +86,9 @@ public class SeleniumBot {
 
         //Variable Values
         try{SKU = monitoringURL.substring(monitoringURL.length()-7); }catch(Exception e){}  //SKU is in the URL
-        try{price = driver.findElement(By.xpath("//*[@class=\"priceView-hero-price priceView-customer-price\"]/span[1]")).getText();}catch(Exception e){} System.out.println(price);
+        //try{price = driver.findElement(By.xpath("//*[@class=\"priceView-hero-price priceView-customer-price\"]/span[1]")).getText();}catch(Exception e){} System.out.println(price);
+        //need to fix bestbuy price. The elements move around and the order changes up quite a bit.
+        price = "See Website"; //temporary until fix price info
         try{productTitle = driver.findElements(By.className("sku-title")).get(0).getText();}catch(Exception e){}
         try{imageURL = driver.findElements(By.className("primary-image")).get(0).getAttribute("src");}catch(Exception e){}
 
@@ -152,7 +156,19 @@ public class SeleniumBot {
                             }
                             //does neither (try -> if) // (catch) blocks if there is availability tag and it says "Currently unavailable."
                             pause(amazonIn);
-                            driver.navigate().refresh();
+                            try {
+                                if(isActive) {
+                                    driver.navigate().refresh();
+                                    pause(timeAfterRefresh);
+                                }
+                            }catch(Exception e){
+                                //for timeouts
+                                driver.quit();
+                                pause(5);
+                                initializeBot();
+                                driver.get(monitoringURL);
+                                pause(4);
+                            }
 
                         }
                         while(isAvailable){
@@ -164,7 +180,19 @@ public class SeleniumBot {
                             }catch(Exception e){
                             }
                             pause(amazonOut);
-                            driver.navigate().refresh();
+                            try {
+                                if(isActive) {
+                                    driver.navigate().refresh();
+                                    pause(timeAfterRefresh);
+                                }
+                            }catch(Exception e){
+                                //for timeouts
+                                driver.quit();
+                                pause(5);
+                                initializeBot();
+                                driver.get(monitoringURL);
+                                pause(4);
+                            }
 
                         }
                     }
@@ -190,7 +218,6 @@ public class SeleniumBot {
                                 pause(1);
                             } catch (Exception e) {}
 
-
                             try{
                                 WebElement availability = driver.findElements(By.className("fulfillment-add-to-cart-button")).get(0); //Only One Though
                                 if(availability.getText().contains("Add to Cart")){
@@ -203,11 +230,30 @@ public class SeleniumBot {
                                 //throws if there is no availability button
                             }
                             //does neither (try -> if) // (catch) blocks if there is availability tag and it says "Currently unavailable."
-                            driver.navigate().refresh();
                             pause(bestBuyIn);
+                            try {
+                                if(isActive) {
+                                    driver.navigate().refresh();
+                                    pause(timeAfterRefresh);
+                                }
+                            }catch(Exception e){
+                                //for timeouts
+                                driver.quit();
+                                pause(5);
+                                initializeBot();
+                                driver.get(monitoringURL);
+                                pause(4);
+                            }
 
                         }
                         while(isAvailable){
+                            //catch the no thanks
+                            try {
+                                WebElement noThx = driver.findElement(By.id("survey_invite_no"));
+                                noThx.click();
+                                pause(1);
+                            } catch (Exception e) {}
+
                             try{
                                 WebElement availability = driver.findElement(By.className("fulfillment-add-to-cart-button"));
                                 if(!availability.getText().contains("Add to Cart")){
@@ -215,8 +261,20 @@ public class SeleniumBot {
                                 }
                             }catch(Exception e){
                             }
-                            driver.navigate().refresh();
                             pause(bestBuyOut);
+                            try {
+                                if(isActive) {
+                                    driver.navigate().refresh();
+                                    pause(timeAfterRefresh);
+                                }
+                            }catch(Exception e){
+                                //for timeouts
+                                driver.quit();
+                                pause(5);
+                                initializeBot();
+                                driver.get(monitoringURL);
+                                pause(4);
+                            }
 
                         }
                     }
@@ -235,14 +293,27 @@ public class SeleniumBot {
                         while(!isAvailable){
                             boolean avail1;
                             try {
-                                driver.findElement(By.xpath("//*[text()='Ship it']")).click(); // "availability":"OutOfStock"
+                                //driver.findElement(By.xpath("//*[text()='Ship it']")).click(); // "availability":"OutOfStock"
+                                driver.findElement(By.xpath("//*[text()='Ship it']"));
                                 // ->
                                 // Broken feature on target werido
                                 // this dismiss message pops up if it is not available even though the ship it
                                 // button pops up.
-                                pause(1);
+//                                pause(1);
+//
+//                                try{ //not always coverage
+//                                    driver.findElement(By.xpath("//*[text()='Decline coverage']")).click(); //Decline coverage
+//                                    pause(1);
+//                                }catch(Exception e){}
+//
+//
+//                                driver.findElement(By.xpath("//*[text()='Continue shopping']")).click(); //Continue shopping
+//                                pause(1);
+
+                                //avail1 = true; //if continue shopping runs then it is available, if not it is false;
+
                                 try {
-                                    driver.findElement(By.xpath("//*[text()='Dismiss']")); // Dismiss
+                                    driver.findElement(By.xpath("//*[text()='Refresh']")); // Dismiss
                                     avail1 = false;
                                 } catch (Exception e) {
                                     // if there is no dismiss button
@@ -260,8 +331,20 @@ public class SeleniumBot {
                                 System.out.println("sent from 1");
                                 isAvailable = true;
                             }
-                            driver.navigate().refresh();
                             pause(targetIn);
+                            try {
+                                if(isActive) {
+                                    driver.navigate().refresh();
+                                    pause(timeAfterRefresh);
+                                }
+                            }catch(Exception e){
+                                //for timeouts
+                                driver.quit();
+                                pause(5);
+                                initializeBot();
+                                driver.get(monitoringURL);
+                                pause(4);
+                            }
 
                         }
                         while(isAvailable){
@@ -275,9 +358,20 @@ public class SeleniumBot {
                             if (avail1 == false) {
                                 isAvailable = false;
                             }
-                            driver.navigate().refresh();
                             pause(targetOut);
-
+                            try {
+                                if(isActive) {
+                                    driver.navigate().refresh();
+                                    pause(timeAfterRefresh);
+                                }
+                            }catch(Exception e){
+                                //for timeouts
+                                driver.quit();
+                                pause(5);
+                                initializeBot();
+                                driver.get(monitoringURL);
+                                pause(4);
+                            }
                         }
                     }
                     pause (2);

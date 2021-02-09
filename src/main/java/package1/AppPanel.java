@@ -118,7 +118,7 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         //text
         g.setColor(Color.WHITE);
         g.setFont(titleFont);
-        g.drawString("Helium Restocks", Runner.WIDTH/11, Runner.HEIGHT/5);
+        g.drawString("Helium Restocks", Runner.WIDTH/11, Runner.HEIGHT/5);//Helium Restocks
 
         //draw GIF
         //flower -> https://i.giphy.com/media/7OWdOFOo1bYyt8cZUD/source.gif
@@ -144,6 +144,11 @@ public class AppPanel extends JPanel implements ActionListener, MouseListener, M
         }
         g.setFont(buttonFont);
         startButton.draw(g);
+
+        //Version Number
+        g.setColor(Color.white);
+        g.setFont(smallButtonFont);
+        g.drawString("Version: "+Runner.versionNum, Runner.WIDTH*34/39, Runner.HEIGHT*55/60);
 
         g2d.dispose();
 

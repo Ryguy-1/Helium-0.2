@@ -4,7 +4,7 @@ plugins {
     id "idea"
 }
 
-version = '0.0'
+version = '0.1'
 
 repositories {
     jcenter()
@@ -30,7 +30,7 @@ task uberJar(type: Jar) {
     manifest{
         attributes 'Main-Class' : 'package1.Runner',
         'Implementation-Title' : 'Helium Restocks',
-        'Implementation-Version' : '0.0'
+        'Implementation-Version' : '0.1'
     }
 
     from {
