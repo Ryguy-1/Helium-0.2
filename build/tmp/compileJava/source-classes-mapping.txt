@@ -1,5 +1,6 @@
 package1/DiscordWebhook.java
  package1.DiscordWebhook
+ package1.DiscordWebhook$1
  package1.DiscordWebhook$EmbedObject
  package1.DiscordWebhook$EmbedObject$Author
  package1.DiscordWebhook$EmbedObject$Field
