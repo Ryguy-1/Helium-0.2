@@ -18,6 +18,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 //creates new Selenium Monitoring Bots. Has a member variable for which site it is monitoring.
 public class SeleniumBot {
 
+    //Development changes...
+
     private ArrayList<WebHookSeleniumManager> myManagers;
 
     private WebDriver driver;
