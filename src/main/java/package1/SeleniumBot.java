@@ -35,8 +35,9 @@ public class SeleniumBot {
     public static final int amazonIn = 30; //30
     public static final int amazonOut = 360; //360
 
-    public static final int bestBuyIn = 15; //15
+    public static final int bestBuyIn = 4; //15
     public static final int bestBuyOut = 30; //30
+    public static final int checkoutTimer = 86400; //after card is added to cart, it waits this long (seconds) for you to checkout before continuing
 
     public static final int targetIn = 15; //15
     public static final int targetOut = 30; //30
@@ -217,26 +218,50 @@ public class SeleniumBot {
                             try {
                                 WebElement noThx = driver.findElement(By.id("survey_invite_no"));
                                 noThx.click();
-                                pause(1);
                             } catch (Exception e) {}
+                            //waiting until page is loaded
+                            boolean pageLoaded = false;
+                            while(!pageLoaded){
+                                try{
+                                    WebElement availability = driver.findElements(By.className("fulfillment-add-to-cart-button")).get(0); //Only One Though
+                                    if(availability.getText().contains("Add to Cart")){
+                                        //clicks add to cart to put you in queue
+                                        availability.click();
+//                                        boolean cartLoading = true;
+//                                        while(cartLoading){
+//                                            try {
+//                                                driver.findElement(By.xpath("//*[text()='Go to Cart']")).click();//go to cart
+//                                                cartLoading = false;
+//                                            } catch(Exception e){}
+//                                        }
+//                                        //will only work if the store is available near you
+//                                        boolean checkoutLoading = true;
+//                                        while(checkoutLoading){
+//                                            try {
+//                                                driver.findElement(By.xpath("//*[text()='Checkout']")).click();//go to checkout
+//                                                checkoutLoading = false;
+//                                            } catch(Exception e){}
+//                                        }
 
-                            try{
-                                WebElement availability = driver.findElements(By.className("fulfillment-add-to-cart-button")).get(0); //Only One Though
-                                if(availability.getText().contains("Add to Cart")){
-                                    //if there is an availability element and it does not say currently unavailable
-                                    System.out.println("Sending 1");
-                                    sendBestBuy();
-                                    isAvailable = true;
+                                        //if there is an availability element and it does not say currently unavailable
+                                        System.out.println("Sending 1");
+                                        sendBestBuy();
+                                        isAvailable = true;
+                                        //Pause for long while and wait for user to checkout
+                                        pause(checkoutTimer);
+                                    }
+                                    pageLoaded = true;
+                                }catch(Exception e) {
+                                    //page still loading
                                 }
-                            }catch(Exception e){
-                                //throws if there is no availability button
                             }
+
                             //does neither (try -> if) // (catch) blocks if there is availability tag and it says "Currently unavailable."
                             pause(bestBuyIn);
                             try {
                                 if(isActive) {
-                                    driver.navigate().refresh();
-                                    pause(timeAfterRefresh);
+                                    driver.get(monitoringURL);
+                                    //pause(timeAfterRefresh);
                                 }
                             }catch(Exception e){
                                 //for timeouts
