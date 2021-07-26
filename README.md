@@ -19,6 +19,4 @@ The Discord bot can be hosted from an instance of the program running on your co
 ## Libraries Used
 Selenium, Selenium ChromeDriver, Discord JDA
 
-## Contributing
-
 
