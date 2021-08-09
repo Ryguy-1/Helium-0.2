@@ -3,7 +3,7 @@
 A Free Way to Beat Scalpers on Tech Products.
 
 ## [Download (Java 1.8)](https://github.com/Ryguy-1/Helium-0.2/raw/master/build/libs/MonitoringBotDistributionV1-0.2-uber.jar)
-- IMPORTANT: Must Download Chromedriver and put Here: '''C:\\Selenium\\chromedriver.exe'''
+- IMPORTANT: Must Download Chromedriver and put Here: ```C:\\Selenium\\chromedriver.exe```
 
 ## Monitoring - Free - 
 
