@@ -1,6 +1,10 @@
 # Helium 0.2 🏪 🔔
 
 A Free Way to Beat Scalpers on Tech Products.
+===================================================
+![image](https://user-images.githubusercontent.com/20056414/128738925-74b43c58-f0b8-4166-9ded-279160af1160.png)
+===================================================
+
 
 ## [Download (Java 1.8)](https://github.com/Ryguy-1/Helium-0.2/raw/master/build/libs/MonitoringBotDistributionV1-0.2-uber.jar)
 - IMPORTANT: Must Download [Chromedriver](https://chromedriver.chromium.org/downloads) and put Here: ```C:\\Selenium\\chromedriver.exe```
