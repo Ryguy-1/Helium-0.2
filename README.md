@@ -1,8 +1,8 @@
-# Helium 0.2
+# Helium 0.2 🏪 🔔
 
-A Free Way to Beat Scalpers on Tech Products
+A Free Way to Beat Scalpers on Tech Products.
 
-## Monitoring
+## Monitoring - Free - 
 
 Helium Implements a No-Proxy, completely free solution to monitoring your favorite Tech Products for restock on BestBuy, Target, and Amazon.
 Notifications sent through discord.
